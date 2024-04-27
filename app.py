@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request
+from flask_compress import Compress
 
 app = Flask(__name__, static_folder="static")
-app.config["Accept-Encoding"] = "gzip, compress, br"
-
+Compress(app)
 
 @app.route("/")
 def hello():

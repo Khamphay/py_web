@@ -11,143 +11,143 @@
     <!-- <script src="../static/dist/apexcharts.js"></script> -->
 
     <style>
-         * {
-     box-sizing: border-box;
- }
+        * {
+            box-sizing: border-box;
+        }
 
- html,
- body {
-     margin: 0;
-     padding: 0;
-     height: 100%;
-     width: 100%;
- }
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
 
- .main-layout {
-     height: 100%;
-     width: 100%;
-     display: table;
-     clear: both;
- }
+        .main-layout {
+            height: 100%;
+            width: 100%;
+            display: table;
+            clear: both;
+        }
 
- /* TODO: Header styles */
- .row-h {
-     width: 100%;
-     display: flex;
-     clear: both;
- }
+        /* TODO: Header styles */
+        .row-h {
+            width: 100%;
+            display: flex;
+            clear: both;
+        }
 
- .row-h>div {
-     margin-left: 10px;
-     width: fix-content;
-     align-content: center;
- }
+        .row-h>div {
+            margin-left: 10px;
+            width: fix-content;
+            align-content: center;
+        }
 
- .sub-ly {
-     width: 100%;
-     float: left;
-     padding: 2px;
- }
+        .sub-ly {
+            width: 100%;
+            float: left;
+            padding: 2px;
+        }
 
- input {
-     border-width: 1px;
-     height: 30px;
-     border-radius: 6px;
- }
+        input {
+            border-width: 1px;
+            height: 30px;
+            border-radius: 6px;
+        }
 
- .button {
-     width: 70px;
-     height: 33px;
-     border-radius: 4px;
-     background-color: rgb(31, 139, 82);
-     border: none;
-     color: white;
-     font-size: 14px;
-     cursor: pointer;
- }
+        .button {
+            width: 70px;
+            height: 33px;
+            border-radius: 4px;
+            background-color: rgb(31, 139, 82);
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
 
- .button:hover {
-     background-color: rgb(60, 160, 107);
- }
+        .button:hover {
+            background-color: rgb(60, 160, 107);
+        }
 
- .button:active {
-     background-color: rgb(16, 179, 94);
- }
+        .button:active {
+            background-color: rgb(16, 179, 94);
+        }
 
- /* TODO: Contect styles */
- .row-grap:after {
-     display: table;
-     clear: both;
- }
+        /* TODO: Contect styles */
+        .row-grap:after {
+            display: table;
+            clear: both;
+        }
 
- .col-grap {
-     float: left;
-     width: 48.5%;
-     padding: 10px;
-     margin: 10px;
-     border: none;
-     height: fit-content;
-     border-radius: 5px;
-     background-color: rgb(255, 255, 255);
-     box-shadow: 0 4px 8px 0 rgba(15, 146, 35, 0.3);
- }
+        .col-grap {
+            float: left;
+            width: 48.5%;
+            padding: 10px;
+            margin: 10px;
+            border: none;
+            height: fit-content;
+            border-radius: 5px;
+            background-color: rgb(255, 255, 255);
+            box-shadow: 0 4px 8px 0 rgba(15, 146, 35, 0.3);
+        }
 
- /*TODO: Dialog styles */
- .btn {
-     background-color: rgba(251, 251, 251);
-     border: none;
-     border-radius: 0.2rem;
-     color: red;
-     padding: 8px 12px;
-     font-size: 16px;
-     cursor: pointer;
- }
+        /*TODO: Dialog styles */
+        .btn {
+            background-color: rgba(251, 251, 251);
+            border: none;
+            border-radius: 0.2rem;
+            color: red;
+            padding: 8px 12px;
+            font-size: 16px;
+            cursor: pointer;
+        }
 
- .btn:hover {
-     background-color: rgba(236, 107, 107, 0.3);
- }
+        .btn:hover {
+            background-color: rgba(236, 107, 107, 0.3);
+        }
 
- .btn:active {
-     background-color: rgba(209, 35, 35, 0.4);
- }
+        .btn:active {
+            background-color: rgba(209, 35, 35, 0.4);
+        }
 
- .btn-dow {
-     background-color: rgba(251, 251, 251);
-     border: none;
-     border-radius: 0.2rem;
-     color: rgb(31, 139, 82);
-     padding: 8px 12px;
-     font-size: 16px;
-     cursor: pointer;
- }
+        .btn-dow {
+            background-color: rgba(251, 251, 251);
+            border: none;
+            border-radius: 0.2rem;
+            color: rgb(31, 139, 82);
+            padding: 8px 12px;
+            font-size: 16px;
+            cursor: pointer;
+        }
 
- /* Darker background on mouse-over */
- .btn-dow:hover {
-     background-color: rgba(31, 139, 82, 0.3);
- }
+        /* Darker background on mouse-over */
+        .btn-dow:hover {
+            background-color: rgba(31, 139, 82, 0.3);
+        }
 
- .btn-dow:active {
-     background-color: rgba(16, 179, 94, 0.4);
- }
+        .btn-dow:active {
+            background-color: rgba(16, 179, 94, 0.4);
+        }
 
- #fileDialog {
-     background-color: rgba(251, 251, 251);
-     width: 500px;
-     height: 560px;
-     margin: auto;
-     padding: 0.4rem;
-     box-shadow: 0 4px 8px 0 rgba(15, 146, 35, 0.3);
-     border: none;
-     transition: 0.3s;
-     border-radius: 5px;
- }
+        #fileDialog {
+            background-color: rgba(251, 251, 251);
+            width: 500px;
+            height: 560px;
+            margin: auto;
+            padding: 0.4rem;
+            box-shadow: 0 4px 8px 0 rgba(15, 146, 35, 0.3);
+            border: none;
+            transition: 0.3s;
+            border-radius: 5px;
+        }
 
- .file {
-     text-align: left;
-     justify-content: center;
-     flex: 80%;
-     padding: 0.6rem;
- }
+        .file {
+            text-align: left;
+            justify-content: center;
+            flex: 80%;
+            padding: 0.6rem;
+        }
     </style>
 </head>
 
@@ -1616,9 +1616,6 @@
             },
         },
     };
-
-    // console.log(options.series[0].data.length);
-
 
     var leftSensorOp = { ...options };
     leftSensorOp.chart.id = "leftSensor";
