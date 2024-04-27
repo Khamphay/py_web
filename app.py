@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 
 app = Flask(__name__, static_folder="static")
+app.config["Accept-Encoding"] = "gzip, compress, br"
 
 
 @app.route("/")
