@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request
-import os
 
 app = Flask(__name__, static_folder="static")
 
@@ -22,4 +21,4 @@ def data():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=6000)
