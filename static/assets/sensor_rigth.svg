@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="175.832" height="165.18" viewBox="0 0 175.832 165.18">
+    <g transform="translate(-1334.784 -813.32)">
+        <g transform="translate(1504.616 859.005) rotate(90)" fill="#fff" stroke="#000"
+            stroke-linecap="round" stroke-linejoin="round" stroke-width="12">
+            <rect width="103.68" height="163" rx="22" stroke="none" />
+            <rect x="6" y="6" width="91.68" height="151" rx="16" fill="none" />
+        </g>
+        <line x2="163.832" transform="translate(1340.784 972.5)" fill="none" stroke="#000"
+            stroke-linecap="round" stroke-width="12" />
+        <line x2="35" transform="matrix(-0.017, 1, -1, -0.017, 1459.661, 817.39)" fill="none"
+            stroke="#000" stroke-linecap="round" stroke-width="8" />
+        <line x2="23" transform="matrix(-0.017, 1, -1, -0.017, 1442.11, 829.388)" fill="none"
+            stroke="#000" stroke-linecap="round" stroke-width="8" />
+        <line x2="23" transform="matrix(-0.017, 1, -1, -0.017, 1389.875, 829.388)" fill="none"
+            stroke="#000" stroke-linecap="round" stroke-width="8" />
+        <line x2="23" transform="matrix(-0.017, 1, -1, -0.017, 1424.768, 829.388)" fill="none"
+            stroke="#000" stroke-linecap="round" stroke-width="8" />
+        <line x2="23" transform="matrix(-0.017, 1, -1, -0.017, 1372.533, 829.388)" fill="none"
+            stroke="#000" stroke-linecap="round" stroke-width="8" />
+        <line x2="35" transform="matrix(-0.017, 1, -1, -0.017, 1355.191, 817.39)" fill="none"
+            stroke="#000" stroke-linecap="round" stroke-width="8" />
+        <line x2="35" transform="matrix(-0.017, 1, -1, -0.017, 1407.426, 817.39)" fill="none"
+            stroke="#000" stroke-linecap="round" stroke-width="8" />
+        <line x2="23" transform="matrix(-0.017, 1, -1, -0.017, 1494.345, 829.388)" fill="none"
+            stroke="#000" stroke-linecap="round" stroke-width="8" />
+        <line x2="23" transform="matrix(-0.017, 1, -1, -0.017, 1477.003, 829.388)" fill="none"
+            stroke="#000" stroke-linecap="round" stroke-width="8" />
+        <text transform="translate(1381.629 928.827)" stroke="#000" stroke-width="1" font-size="55"
+            font-family="ConcertOne-Regular, Concert One">
+            <tspan x="0" y="0">R</tspan>
+        </text>
+        <g transform="translate(2902.067 1800.006) rotate(180)">
+            <line x2="0.569" y2="50.369" transform="matrix(0.017, -1, 1, 0.017, 1427.129, 889.069)"
+                fill="none" stroke="#000" stroke-linecap="round" stroke-width="6" />
+            <path d="M0-3.027l8.719-14.9,8.347,14.9"
+                transform="matrix(0.017, -1, 1, 0.017, 1437.456, 897.876)" fill="none" stroke="#000"
+                stroke-linecap="round" stroke-width="6" />
+        </g>
+    </g>
+</svg>

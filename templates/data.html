@@ -4,12 +4,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Data Monitor</title>
+
+    <style>
+        html,
+        body {
+            font-family: "Roboto", "Noto Sans Lao";
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: auto auto auto;
+            gap: 10px;
+            padding: 10px;
+            place-items: center;
+        }
+
+        .card {
+            border-radius: 6px;
+            margin: 4px;
+            padding: 2px;
+            width: 200px;
+            height: 120px;
+            background-color: #E3E8E6;
+
+        }
+
+        img {
+            width: 30px;
+            height: 30px;
+        }
+    </style>
 </head>
 
 <body>
-    <p>Welcome admid page Mr. {{data.username}}</p>
-    <p>Your password is: {{data.password}}</p>
+    <div style="margin: auto;  background-color: rgb(245, 246, 246); width: 50%; height: 100vh;">
+        <div class="main-layout">
+            <div class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/calendar.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Date Time</h4>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    20-05-2024 13:00:34
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/calendar.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Date Time</h4>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    20-05-2024 13:00:34
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/calendar.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Date Time</h4>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    20-05-2024 13:00:34
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/calendar.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Date Time</h4>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    20-05-2024 13:00:34
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/calendar.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Date Time</h4>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    20-05-2024 13:00:34
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
