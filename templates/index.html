@@ -61,7 +61,7 @@
 
         /* TODO: Header styles */
         .header {
-            box-shadow: 0 4px 8px 0 rgba(31, 175, 55, 0.233);
+            box-shadow: 0 4px 8px 0 rgba(31, 175, 55, 0.15);
             height: 45px;
         }
 
@@ -134,6 +134,7 @@
         .col-grap {
             /* float: left; */
             width: 50%;
+            height: 260px;
             padding: 6px;
             margin: 6px;
         }
@@ -258,10 +259,11 @@
             align-items: center;
         }
 
-        .pagination a {
+        .pagination button {
             color: black;
+            border-width: 0px;
             float: left;
-            padding: 6px 6px;
+            padding: 4px 4px 4px 4px;
             text-decoration: none;
             border-radius: 4px;
             text-align: center;
@@ -269,7 +271,7 @@
             margin: 2px;
         }
 
-        .pagination a img {
+        .pagination button img {
             width: 21px;
             height: 13px;
             margin-top: 2px;
@@ -277,19 +279,20 @@
             margin-left: 2px;
         }
 
-        .pagination a:hover {
+        .pagination button:hover {
             background-color: rgba(27, 210, 82, 0.618);
-            color: white;
+            /* color: white; */
         }
 
-        .pagination a:active {
+        .pagination button:active {
             background-color: var(--active-color);
-            color: white;
+            /* color: white; */
         }
 
         .pagination span {
             text-align: center;
             align-self: center;
+            padding: 4px;
         }
     </style>
 </head>
@@ -300,22 +303,22 @@
             <section class="row-h">
                 <div>
                     <label>Selelect date:</label>
-                    <input type="date">
+                    <input type="date" id="dateTime" onchange="onDateChange()">
                 </div>
-                <div><button class="button" type="submit">Refresh</button></div>
+                <div><button class="button" onclick="onRefreshClick()">Refresh</button></div>
                 <div>
                     <label>File name:</label>
-                    <input type="text" style="height: 30px; border-radius: 6px;">
+                    <input type="text" id="fileName" style="height: 30px; border-radius: 6px;">
                 </div>
                 <div style="width: fix-content;">
                     <label>Timer (minutes):</label>
-                    <input type="text" maxlength="4" onkeypress="return /[0-9]/i.test(event.key)" min="1" max="120" style="height: 30px; width: 60px; border-radius: 6px;">
+                    <input type="text" id="interval" maxlength="4" onkeypress="return /[0-9]/i.test(event.key)" min="1" max="120" style="height: 30px; width: 60px; border-radius: 6px;">
                 </div>
-                <div> <button class="button" type="submit">Record</button></div>
-                <div><button class="button" type="button" onclick="showFileHistory()">Files</button></div>
+                <div> <button class="button" onclick="recordData()">Record</button></div>
+                <div><button class="button" onclick="showFileHistory()">Files</button></div>
                 <div>
                     <a href="{{url_for('monitor')}}">
-                        <button class="button" type="button" style="width: fit-content;" onclick=""><i class="fa-solid fa-gauge"></i> Monitor</button>
+                        <button class="button" style="width: fit-content;" onclick=""><i class="fa-solid fa-gauge"></i> Monitor</button>
                     </a>
                 </div>
                 <dialog id="fileDialog">
@@ -370,7 +373,7 @@
         <hr />
         <section style="width: 100%; text-align: center; display: flex; justify-content: center; align-items: center;">
             <div class="pagination">
-                <select name="view" id="selection">
+                <select onchange="onSelectChange()" name="view" id="selection">
                     <option value="10">10</option>
                     <option value="30">30</option>
                     <option value="50">50</option>
@@ -380,14 +383,14 @@
                     <option value="400">400</option>
                     <option value="500">500</option>
                 </select>
-                <a href="#"><img src="/static/assets/dou_left.svg" alt=""></a>
-                <a href="#"><img src="/static/assets/sin_left.svg" alt=""></a>
+                <button><img src="/static/assets/dou_left.svg" alt=""></button>
+                <button onclick="previousPage()"><img src="/static/assets/sin_left.svg" alt=""></button>
                 <span>Page</span><span id="currentPage">0</span><span>of</span> <span id="totalPage"> 20</span>
-                <a href="#"><img src="/static/assets/sin_right.svg" alt=""></a>
-                <a href="#"><img src="/static/assets/dou_right.svg" alt=""></a>
+                <button onclick="nextPage()"><img src="/static/assets/sin_right.svg" alt=""></button>
+                <button><img src="/static/assets/dou_right.svg" alt=""></button>
             </div>
         </section>
-        <section class="card" style="margin: 4px; max-height: 500px; overflow: auto;">
+        <section class="card" style="margin-bottom: 8px; padding: 4px; max-height: 500px; overflow: auto;">
             <table id="data-table">
                 <thead>
                     <tr>
@@ -407,25 +410,6 @@
                     </tr>
                 </thead>
                 <tbody id="tbody">
-                    <!-- <tr>
-                        <td>{{item.date}}</td>
-                        <td>{{item.diam1}}</td>
-                        <td>{{item.diam2}}</td>
-                        <td>{{item.high}}</td>
-                        <td>{{item.wieght}}</td>
-                        <td>{{item.emiss1}}</td>
-                        <td>{{item.emiss2}}</td>
-                        <td>{{item.airh1}}</td>
-                        <td>{{item.airh2}}</td>
-                        <td>{{item.temp1}}</td>
-                        <td>{{item.temp2}}</td>
-                        <td>{{item.temp3}}</td>
-                        <td>
-                            <button class="button btn-detail" onclick="shoRowDetails(this)">
-                                <i class="fa-solid fa-ellipsis"></i>
-                            </button>
-                        </td>
-                    </tr> -->
                 </tbody>
             </table>
         </section>
@@ -451,12 +435,14 @@
 
 <script>
     var page = 1;
-    var perPage = 10;
+    var totalPage = 10;
+    var onDate = null;
     var chart_catego = [];
     var tbody = document.getElementById("tbody");
-    const selectElm = document.getElementById("selection");
-    perPage = selectElm.value;
-    const fileDialog = document.getElementById("fileDialog");
+    var currentPage = document.getElementById('currentPage');
+    var totalPageElm = document.getElementById('totalPage');
+    var selectElm = document.getElementById("selection");
+    var fileDialog = document.getElementById("fileDialog");
     const lables = [
         { id: "date", icon: "calendar.svg", name: "Date Time", unit: "", ytitle: "Date Time", data: [] },
         { id: "leftSensor", icon: "sensor_letf.svg", name: "Diameter Sensor 1", unit: "Volt", ytitle: "Diameter", data: [] },
@@ -471,41 +457,8 @@
         { id: "temp2", icon: "temperature_2.svg", name: "Temperature (CO2-2)", unit: "°C", ytitle: "Temperature", data: [] },
         { id: "temp3", icon: "temperature_3.svg", name: "Temperature (DS18)", unit: "°C", ytitle: "Temperature", data: [] }
     ];
-    var fileList = ["File name show here", "File name show here", "File name show here", "File name show here", "File name show here", "File name show here"];
 
-    document.getElementById('currentPage').innerHTML = `Page ${data.page} of ${data.perPage}`;
-    // function fillDataChart() {
-
-    //     // for (item of data.data) {
-    //     //     diam1_chart.push(parseFloat(item.diam1));
-    //     //     diam2_chart.push(parseFloat(item.diam2));
-    //     //     h_chart.push(parseFloat(item.height));
-    //     //     w_chart.push(parseFloat(item.wieght));
-    //     //     emiss1_chart.push(parseFloat(item.emiss1));
-    //     //     emiss2_chart.push(parseFloat(item.emiss2));
-    //     //     air1_chart.push(parseFloat(item.airh1));
-    //     //     air2_chart.push(parseFloat(item.airh2));
-    //     //     temp1_chart.push(parseFloat(item.temp1));
-    //     //     temp2_chart.push(parseFloat(item.temp2));
-    //     //     temp3_chart.push(parseFloat(item.temp3));
-    //     //     chart_catego.push(new Date(item.date).toISOString());
-    //     // }
-
-    //     for (index, item of lables) {
-    //         if (index == 0) continue;
-    //         renderChart(item.id, item.name, lables[0].data, item.data, `Diameter (${item.unit})`);
-    //         // renderChart('rigthSensor', lables[2].name, chart_catego, diam2_chart, `Diameter (${lables[2].unit})`);
-    //         // renderChart('heightSensor', lables[3].name, chart_catego, h_chart, `Diameter (${lables[3].unit})`);
-    //         // renderChart('weightBal', lables[4].name, chart_catego, w_chart, `Weight (${lables[4].unit})`);
-    //         // renderChart('emisCO21', lables[5].name, chart_catego, emiss1_chart, `Emission (${lables[5].unit})`);
-    //         // renderChart('emisCO22', lables[6].name, chart_catego, emiss2_chart, `Emission (${lables[6].unit})`);
-    //         // renderChart('airHum1', lables[7].name, chart_catego, air1_chart, `Air Humidity (${lables[7].unit})`);
-    //         // renderChart('airHum2', lables[8].name, chart_catego, air2_chart, `Air Humidity (${lables[8].unit})`);
-    //         // renderChart('temp1', lables[9].name, chart_catego, temp1_chart, `Temperature (${lables[9].unit})`);
-    //         // renderChart('temp2', lables[10].name, chart_catego, temp2_chart, `Temperature (${lables[10].unit})`);
-    //         // renderChart('temp3', lables[11].name, chart_catego, temp3_chart, `Temperature (°${lables[11].unit})`);
-    //     }
-    // }
+    fillData(page);
 
     function clearData() {
         lables[0].data = [];
@@ -562,37 +515,75 @@
                 },
             };
 
-            let chartElement = document.getElementById(chart_id);
+            let chartElement = document.getElementById(lables[index].id);
             chartElement.innerHTML = null;
             var chart = new ApexCharts(chartElement, options);
             chart.render();
         }
     }
 
-    async function fetchData(page, perPage) {
+    function recordData() {
+        try {
+            const fileName = document.getElementById("fileName");
+            const interval = document.getElementById("interval");
+            if (fileName.value == "" || parseInt(interval.value ?? 0) >= 0)
+                return alert("Please check the file name or timer.");
+            const timer = parseInt(interval.value) * 60;
+
+            fetch(`/start/${timer}/${fileName.value}`).then(response => response.json()).then(data => alert(data));
+        } catch (error) {
+            console.log(error);
+            alert("Save data error: " + e);
+        }
+    }
+
+    async function readFileHistory() {
+        try {
+            const files = await fetch('/get/history').then(response => response.json()).then(data => data);
+            return files;
+        } catch (error) {
+            console.log(error);
+            alert("List files error: " + e);
+        }
+    }
+
+
+
+    async function fetchData(onPage) {
         let res_data = null;
         try {
-            res_data = await fetch('/data', {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ page: data.page - 1, perPage: data.perPage })
-            }).then(response => response.json());
+            res_data = await fetch(`/data?page=${onPage}&perPage=${parseInt(selectElm.value ?? 10)}&date=${onDate}`, {
+                // method: "POST",
+                // headers: { 'Content-Type': 'application/json' },
+                // body: JSON.stringify({ page: onPage, perPage: showPerPage })
+            }).then(response => response.json()).then(data => data);
         } catch (error) {
             console.log(error);
             alert("Loading data error: " + e);
         }
-
         return res_data;
     }
 
-    async function previousPage(page) {
+    async function previousPage() {
         if (page <= 1)
             return;
-        const res_data = await fetchData(page - 1, data.perPage);
+        page = page - 1;
+        fillData(page);
+    }
+
+    async function nextPage() {
+        if (page >= totalPage)
+            return;
+        page = page + 1;
+        fillData(page);
+    }
+
+    async function fillData(onPage) {
+        const res_data = await fetchData(onPage);
         if (res_data == null) return alert("No data");
-        page = res_data.page;
-        perPage = res_data.perPage;
         clearData();
+        currentPage.innerHTML = page;
+        totalPageElm.innerHTML = totalPage = Math.ceil(parseInt(res_data.total) / parseInt(selectElm.value));
         tbody.innerHTML = null;
         for (const item of res_data.data) {
             lables[0].data.push(new Date(item.date).toISOString());
@@ -608,11 +599,11 @@
             lables[10].data.push(parseFloat(item.temp2));
             lables[11].data.push(parseFloat(item.temp3));
 
-            let tr = document.createElement('tr');
-            tr.innerHTML = `<td>${item.date}</td>
+            let trow = document.createElement('tr');
+            trow.innerHTML = `<td>${item.date}</td>
                         <td>${item.diam1}</td>
                         <td>${item.diam2}</td>
-                        <td>${item.high}</td>
+                        <td>${item.height}</td>
                         <td>${item.wieght}</td>
                         <td>${item.emiss1}</td>
                         <td>${item.emiss2}</td>
@@ -626,18 +617,27 @@
                                 <i class="fa-solid fa-ellipsis"></i>
                             </button>
                         </td>`;
-
-            tbody.append();
+            tbody.appendChild(trow);
         }
+
+        renderChart();
     }
 
-    function nextPage(page) {
-
+    function onDateChange() {
+        const dateElm = document.getElementById("dateTime");
+        onDate = dateElm.value;
     }
 
+    function onRefreshClick() {
+        page = 1;
+        fillData(page);
+    }
+
+    function onSelectChange() {
+        fillData(page);
+    }
 
     //Details Dialog Script
-
     function shoRowDetails(click) {
         //   const dataTable = document.getElementById("data-table");
         // dataTable.addEventListener('click', (e) => {
@@ -683,7 +683,8 @@
     }
 
     // "Show the dialog" button opens the <dialog> modally
-    function showFileHistory() {
+    async function showFileHistory() {
+        const fileList = await readFileHistory();
         var ulList = document.getElementById('fileList');
         ulList.innerHTML = null;
 
