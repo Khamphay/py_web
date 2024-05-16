@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Monitor</title>
+    <script src="/static/client-dist/socket.io.js"></script>
+
+    <style>
+        :root {
+            font-size: 14px;
+        }
+
+        html,
+        body {
+            font-family: "Roboto", "Noto Sans Lao";
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: auto auto auto;
+            gap: 10px;
+            padding: 10px;
+            place-items: center;
+        }
+
+        .card {
+            border-radius: 6px;
+            margin: 4px;
+            padding: 2px;
+            width: 250px;
+            height: 120px;
+            background-color: #E3E8E6;
+
+        }
+
+        img {
+            width: 30px;
+            height: 30px;
+        }
+
+        h4 {
+            margin: 10px 0px;
+        }
+
+        .context {
+            margin: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <main style="margin: auto;  background-color: rgb(245, 246, 246); width: 70%; height: 100vh;">
+        <div class="main-layout">
+            <section class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/calendar.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Date Time</h4>
+                    </div>
+                </div>
+                <div class="context" id="date" style="text-align: center;">
+                    20-05-2024 13:00:34
+                </div>
+            </section>
+
+            <section class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/sensor_letf.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Diameter Sensor 1</h4>
+                    </div>
+                </div>
+                <div class="context" id="diameter1" style="text-align: center;">
+                    0.00 Volt
+                </div>
+            </section>
+
+            <section class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/sensor_rigth.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Diameter Sensor 2</h4>
+                    </div>
+                </div>
+                <div class="context" id="diameter2" style="text-align: center;">
+                    0.00 Volt
+                </div>
+            </section>
+
+            <section class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/sensor_hiegth.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>High Sensor</h4>
+                    </div>
+                </div>
+                <div class="context" id="heightSensor" style="text-align: center;">
+                    0.00 Volt
+                </div>
+            </section>
+
+            <section class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/scale.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Soil Weight</h4>
+                    </div>
+                </div>
+                <div class="context" id="weight" style="text-align: center;">
+                    00 g
+                </div>
+            </section>
+            <section class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/co2_1.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Emission 1 (CO2-1)</h4>
+                    </div>
+                </div>
+                <div class="context" id="emiss1" style="text-align: center;">
+                    0.00 ppm
+                </div>
+            </section>
+            <section class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/co2_2.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Emission 2 (CO2-2)</h4>
+                    </div>
+                </div>
+                <div class="context" id="weight" style="text-align: center;">
+                    0.00 ppm
+                </div>
+            </section>
+            <section class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/air_humidity_1.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Air Humidity 1 (CO2-1)</h4>
+                    </div>
+                </div>
+                <div class="context" id="air_hum1" style="text-align: center;">
+                    0.00 %
+                </div>
+            </section>
+            <section class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/air_humidity_2.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Air Humidity 2 (CO2-2)</h4>
+                    </div>
+                </div>
+                <div class="context" id="air_hum2" style="text-align: center;">
+                    0.00 %
+                </div>
+            </section>
+            <section class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/temperature_1.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Temperature 1 (CO2-1)</h4>
+                    </div>
+                </div>
+                <div class="context" id="temp1" style="text-align: center;">
+                    0.00 °C
+                </div>
+            </section>
+            <section class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/temperature_2.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Temperature 2 (CO2-2)</h4>
+                    </div>
+                </div>
+                <div class="context" id="temp2" style="text-align: center;">
+                    0.00 °C
+                </div>
+            </section>
+            <section class="card">
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <img src="/static/assets/temperature_3.svg" style="margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;"></img>
+                    <div>
+                        <h4>Temperature 3 (DS18B20)</h4>
+                    </div>
+                </div>
+                <div class="context" id="temp3" style="text-align: center;">
+                    0.00 °C
+                </div>
+            </section>
+        </div>
+    </main>
+</body>
+
+</html>
+
+<script>
+    const socket = io();
+
+    socket.on("data", (data) => {
+        console.log(data);
+        var diameter1 = document.getElementById('diameter1');
+        diameter1.innerHTML = data.val1;
+        var diameter2 = document.getElementById('diameter2');
+        diameter2.innerHTML = data.val2;
+    })
+</script>

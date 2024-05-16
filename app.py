@@ -1,579 +1,117 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
+from flask_socketio import SocketIO
 from flask_compress import Compress
+import time
+from threading import Thread, Event
+import csv
+import os
 
 app = Flask(__name__, static_folder="static")
 Compress(app)
+socketio = SocketIO(app)
+tasks: list[Thread] = []
+
+val1 = 10
+val2 = 12
+# stop_event: Event
 
 
-class DataSrc:
-    def __init__(
-        self,
-        date: str,
-        diam1: float,
-        diam2: float,
-        high: float,
-        wieght: float,
-        emiss1: float,
-        emiss2: float,
-        airh1: float,
-        airh2: float,
-        temp1: float,
-        temp2: float,
-        temp3: float,
-    ):
-        self.date = date
-        self.diam1 = diam1
-        self.diam2 = diam2
-        self.high = high
-        self.wieght = wieght
-        self.emiss1 = emiss1
-        self.emiss2 = emiss2
-        self.airh1 = airh1
-        self.airh2 = airh2
-        self.temp1 = temp1
-        self.temp2 = temp2
-        self.temp3 = temp3
+def stop_thread():
+    global stop_event
+    stop_event.set()
 
-csv_data: list[DataSrc] = []
-csv_data.append(
-    DataSrc(
-        "03-05-2024 06:54:36",
-        1.364,
-        1.368,
-        1.565,
-        37.75,
-        402.41,
-        36.605,
-        39.726,
-        605.781,
-        35.615,
-        42.854,
-        33.533,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 06:55:36",
-        1.364,
-        1.368,
-        1.57,
-        37.75,
-        400.585,
-        36.632,
-        39.728,
-        606.451,
-        35.615,
-        42.914,
-        33.513,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 06:56:36",
-        1.365,
-        1.369,
-        1.581,
-        37.75,
-        398.306,
-        36.605,
-        39.713,
-        604.545,
-        35.558,
-        42.996,
-        33.507,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 06:57:36",
-        1.365,
-        1.368,
-        1.588,
-        37.75,
-        393.391,
-        36.605,
-        39.668,
-        601.114,
-        35.585,
-        43.658,
-        33.533,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 06:58:36",
-        1.364,
-        1.368,
-        1.572,
-        37.75,
-        395.403,
-        36.589,
-        39.682,
-        603.518,
-        35.545,
-        43.686,
-        33.487,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 06:59:36",
-        1.365,
-        1.369,
-        1.565,
-        37.75,
-        397.232,
-        36.589,
-        39.682,
-        608.362,
-        35.585,
-        43.617,
-        33.473,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:00:36",
-        1.365,
-        1.369,
-        1.578,
-        37.75,
-        395.429,
-        36.589,
-        39.709,
-        608.567,
-        35.585,
-        43.449,
-        33.48,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:01:36",
-        1.365,
-        1.368,
-        1.569,
-        37.75,
-        396.977,
-        36.573,
-        39.667,
-        609.713,
-        35.558,
-        43.088,
-        33.5,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:02:36",
-        1.365,
-        1.369,
-        1.577,
-        37.75,
-        398.783,
-        36.573,
-        39.723,
-        612.356,
-        35.572,
-        43.028,
-        33.487,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:03:36",
-        1.364,
-        1.368,
-        1.585,
-        37.75,
-        400.081,
-        36.589,
-        39.709,
-        611.445,
-        35.545,
-        43.175,
-        33.473,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:04:36",
-        1.365,
-        1.369,
-        1.587,
-        37.75,
-        398.929,
-        36.589,
-        39.696,
-        609.627,
-        35.404,
-        44.478,
-        33.48,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:05:36",
-        1.365,
-        1.368,
-        1.591,
-        37.75,
-        396.92,
-        36.573,
-        39.723,
-        618.337,
-        35.249,
-        45.215,
-        33.487,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:06:36",
-        1.365,
-        1.369,
-        1.6,
-        37.75,
-        397.406,
-        36.589,
-        39.667,
-        622.545,
-        35.134,
-        43.427,
-        33.473,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:07:36",
-        1.364,
-        1.369,
-        1.587,
-        37.75,
-        395.446,
-        36.56,
-        39.694,
-        627.95,
-        35.177,
-        42.294,
-        33.487,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:08:36",
-        1.364,
-        1.368,
-        1.59,
-        37.75,
-        395.501,
-        36.56,
-        39.735,
-        627.48,
-        35.262,
-        42.184,
-        33.473,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:09:36",
-        1.364,
-        1.37,
-        1.579,
-        37.75,
-        396.331,
-        36.56,
-        39.749,
-        630.134,
-        35.348,
-        42.404,
-        33.467,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:10:36",
-        1.364,
-        1.369,
-        1.587,
-        37.75,
-        396.207,
-        36.573,
-        39.735,
-        627.573,
-        35.361,
-        42.661,
-        33.453,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:11:36",
-        1.364,
-        1.369,
-        1.584,
-        37.75,
-        396.733,
-        36.547,
-        39.662,
-        625.367,
-        35.446,
-        42.699,
-        33.427,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:12:36",
-        1.365,
-        1.369,
-        1.586,
-        37.75,
-        396.79,
-        36.56,
-        39.708,
-        621.274,
-        35.446,
-        42.596,
-        33.433,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:13:36",
-        1.364,
-        1.369,
-        1.58,
-        37.75,
-        395.96,
-        36.547,
-        39.705,
-        620.561,
-        35.404,
-        42.424,
-        33.42,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:14:36",
-        1.365,
-        1.368,
-        1.552,
-        37.75,
-        397.294,
-        36.53,
-        39.731,
-        621.502,
-        35.446,
-        42.189,
-        33.406,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:15:36",
-        1.365,
-        1.369,
-        1.572,
-        37.75,
-        395.464,
-        36.53,
-        39.694,
-        621.103,
-        35.39,
-        42.184,
-        33.406,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:16:36",
-        1.365,
-        1.369,
-        1.569,
-        37.75,
-        395.707,
-        36.517,
-        39.717,
-        622.484,
-        35.446,
-        42.278,
-        33.406,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:17:36",
-        1.365,
-        1.369,
-        1.57,
-        37.75,
-        393.195,
-        36.547,
-        39.691,
-        629.517,
-        35.489,
-        42.18,
-        33.413,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:18:36",
-        1.365,
-        1.369,
-        1.577,
-        37.75,
-        395.235,
-        36.53,
-        39.618,
-        629.585,
-        35.489,
-        41.924,
-        33.413,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:19:36",
-        1.364,
-        1.37,
-        1.564,
-        37.75,
-        396.622,
-        36.517,
-        39.673,
-        626.558,
-        35.502,
-        41.942,
-        33.407,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:20:36",
-        1.365,
-        1.369,
-        1.576,
-        37.75,
-        397.121,
-        36.517,
-        39.645,
-        623.644,
-        35.529,
-        41.824,
-        33.4,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:21:36",
-        1.365,
-        1.368,
-        1.563,
-        37.75,
-        396.692,
-        36.504,
-        39.7,
-        623.98,
-        35.502,
-        41.745,
-        33.363,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:22:36",
-        1.365,
-        1.369,
-        1.566,
-        37.75,
-        397.438,
-        36.504,
-        39.687,
-        622.761,
-        35.558,
-        41.797,
-        33.392,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:23:36",
-        1.365,
-        1.369,
-        1.566,
-        37.75,
-        397.088,
-        36.504,
-        39.673,
-        625.605,
-        35.516,
-        41.626,
-        33.364,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:24:36",
-        1.365,
-        1.369,
-        1.565,
-        37.75,
-        398.579,
-        36.517,
-        39.673,
-        628.442,
-        35.529,
-        41.568,
-        33.391,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:25:36",
-        1.365,
-        1.369,
-        1.555,
-        37.75,
-        401.84,
-        36.49,
-        39.685,
-        627.615,
-        35.545,
-        41.571,
-        33.392,
-    )
-)
-csv_data.append(
-    DataSrc(
-        "03-05-2024 07:26:36",
-        1.365,
-        1.369,
-        1.557,
-        37.75,
-        402.669,
-        36.504,
-        39.7,
-        626.84,
-        35.516,
-        41.823,
-        33.392,
-    )
-)
+
+def read_csv_file(start_line: int, end_line: int):
+    json_data = []
+    total = 0
+    with open(os.path.join(os.getcwd(), "static/data_test.csv"), "r") as file:
+        csv_data = csv.reader(file, delimiter=",")
+        for i, row in enumerate(csv_data):
+            if i < start_line:
+                continue
+            if i > end_line:
+                break
+            data_dict = {
+                "date": row[0],
+                "diam1": row[1],
+                "diam2": row[2],
+                "height": row[3],
+                "wieght": row[4],
+                "emiss1": row[5],
+                "emiss2": row[6],
+                "airh1": row[7],
+                "airh2": row[8],
+                "temp1": row[9],
+                "temp2": row[10],
+                "temp3": row[11],
+            }
+            json_data.append(data_dict)
+        total = sum(1 for _ in csv_data)
+        file.close()
+    return {"data": json_data, "total": total}
 
 
 @app.route("/", methods=["GET"])
 def hello():
-    return render_template("index.html", data=csv_data)
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("perPage", 500, type=int)
+    end = per_page * page
+    start = (end - per_page) + 1
+    json_data = read_csv_file(start, end)
+    json_data["page"] = page
+    json_data["perPage"] = per_page
+    return render_template("index.html", data=json_data, page=4)
 
-
-@app.route("/data", methods=["POST", "GET"])
+@app.route("/data", methods=["POST"])
 def data():
-    return render_template("data.html", data=data)
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("perPage", 500, type=int)
+    end = per_page * page
+    start = (end - per_page) + 1
+    json_data = read_csv_file(start, end)
+    json_data["page"] = page
+    json_data["perPage"] = per_page
+    return jsonify(json_data)
+
+
+@app.route("/monitor", methods=["POST", "GET"])
+def monitor():
+    return render_template("monitor.html")
+
+
+@socketio.on("connect")
+def onConnect(client):
+    print(f"Client {request.sid} connected!!!")
+
+    def onSendData(interval: int, stop: Event):
+        while not stop.is_set():
+            global val1
+            val1 += 1
+            global val2
+            val2 += 2
+            print("Emit code!!!")
+            socketio.emit("data", {"val1": val1, "val2": val2})
+            time.sleep(interval)
+
+    global stop_event
+    stop_event = Event()
+    client = Thread(
+        target=onSendData, name=request.sid, args=(5, stop_event), daemon=True
+    )
+    client.start()
+    tasks.append(client)
+
+
+@socketio.on("disconnect")
+def onDisconnect():
+    for client in tasks:
+        if client.getName() == request.sid:
+            stop_thread()
+            client.join()
+            print(f"Client {request.sid} !!!")
+            tasks.remove(client)
+            return
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    socketio.run(debug=True, port=5000)

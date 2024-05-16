@@ -11,7 +11,7 @@
     <link href="/website/css/uicons-solid-rounded.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Noto Sans Lao">
     <!-- <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script> -->
-    <script rel="preload" src="../static/dist/apexcharts.js"></script>
+    <script rel="preload" src="/static/dist/apexcharts.js"></script>
 
     <style>
         * {
@@ -19,9 +19,11 @@
         }
 
         :root {
-            font-size: small;
+            font-size: 14px;
             --main-color: rgb(31, 139, 82);
             --text-color: white;
+            --hover-color: rgba(31, 139, 82, 0.3);
+            --active-color: rgba(16, 179, 94, 0.4);
         }
 
         html,
@@ -35,6 +37,12 @@
 
         input {
             padding: 6px 6px;
+        }
+
+        select {
+            height: 30px;
+            width: 50px;
+            text-align: center;
         }
 
         .main-layout {
@@ -126,8 +134,8 @@
         .col-grap {
             /* float: left; */
             width: 50%;
-            padding: 10px;
-            margin: 10px;
+            padding: 6px;
+            margin: 6px;
         }
 
         /* @media (max-width: 300px) {
@@ -147,6 +155,19 @@
             color: var(--text-color);
             height: 3rem;
         }
+
+        /* Freeze Header */
+        thead {
+            z-index: 1;
+        }
+
+        thead,
+        tr>th {
+            position: sticky;
+            top: 0;
+        }
+
+        /*End Freeze*/
 
         th,
         td {
@@ -204,11 +225,11 @@
 
         /* Darker background on mouse-over */
         .btn-dow:hover {
-            background-color: rgba(31, 139, 82, 0.3);
+            background-color: var(--hover-color);
         }
 
         .btn-dow:active {
-            background-color: rgba(16, 179, 94, 0.4);
+            background-color: var(--active-color)
         }
 
         #fileDialog {
@@ -230,105 +251,143 @@
             flex: 80%;
             padding: 0.6rem;
         }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pagination a {
+            color: black;
+            float: left;
+            padding: 6px 6px;
+            text-decoration: none;
+            border-radius: 4px;
+            text-align: center;
+            justify-content: center;
+            margin: 2px;
+        }
+
+        .pagination a img {
+            width: 21px;
+            height: 13px;
+            margin-top: 2px;
+            text-align: center;
+            margin-left: 2px;
+        }
+
+        .pagination a:hover {
+            background-color: rgba(27, 210, 82, 0.618);
+            color: white;
+        }
+
+        .pagination a:active {
+            background-color: var(--active-color);
+            color: white;
+        }
+
+        .pagination span {
+            text-align: center;
+            align-self: center;
+        }
     </style>
 </head>
 
 <body>
-    <div class="main-layout">
-        <div class="sub-ly" style="height: 60px; align-content: center;  background-color: rgb(243, 243, 243);">
-            <div class="header">
-                <div class="row-h">
-                    <div>
-                        <label>Selelect date:</label>
-                        <input type="date">
-                    </div>
-                    <div><button class="button" type="submit">Refresh</button></div>
-                    <div>
-                        <label>File name:</label>
-                        <input type="text" style="height: 30px; border-radius: 6px;">
-                    </div>
-                    <div style="width: fix-content;">
-                        <label>Timer (minutes):</label>
-                        <input type="text" maxlength="4" onkeypress="return /[0-9]/i.test(event.key)" min="1" max="120" style="height: 30px; width: 60px; border-radius: 6px;">
-                    </div>
-                    <div> <button class="button" type="submit">Record</button></div>
-                    <div><button class="button" type="button" onclick="showFileHistory()">Files</button></div>
-                    <div>
-                        <a href="{{url_for('data')}}">
-                            <button class="button" type="button" style="width: fit-content;" onclick=""><i class="fa-solid fa-gauge"></i> Monitor</button>
-                        </a>
-                    </div>
-                    <dialog id="fileDialog">
-                        <div style="display: flex; height: max-content;">
-                            <div style="width: 100%; ">
-                                <h4 style="margin: 8px;">File histories</h4>
-                            </div>
-                            <div>
-                                <button class="btn" id="btnClose" value="cancel" formmethod="dialog"><i class="fa fa-close"></i></button>
-                            </div>
+    <header class="sub-ly" style="height: 60px; align-content: center;  background-color: rgb(243, 243, 243);">
+        <nav class="header">
+            <section class="row-h">
+                <div>
+                    <label>Selelect date:</label>
+                    <input type="date">
+                </div>
+                <div><button class="button" type="submit">Refresh</button></div>
+                <div>
+                    <label>File name:</label>
+                    <input type="text" style="height: 30px; border-radius: 6px;">
+                </div>
+                <div style="width: fix-content;">
+                    <label>Timer (minutes):</label>
+                    <input type="text" maxlength="4" onkeypress="return /[0-9]/i.test(event.key)" min="1" max="120" style="height: 30px; width: 60px; border-radius: 6px;">
+                </div>
+                <div> <button class="button" type="submit">Record</button></div>
+                <div><button class="button" type="button" onclick="showFileHistory()">Files</button></div>
+                <div>
+                    <a href="{{url_for('monitor')}}">
+                        <button class="button" type="button" style="width: fit-content;" onclick=""><i class="fa-solid fa-gauge"></i> Monitor</button>
+                    </a>
+                </div>
+                <dialog id="fileDialog">
+                    <div style="display: flex; height: max-content;">
+                        <div style="width: 100%; ">
+                            <h4 style="margin: 8px;">File histories</h4>
                         </div>
-                        <hr style="color: rgba(0, 133, 0, 0.4);" />
                         <div>
-                            <div style="justify-content: center;">
-                                <ul id="fileList" style="padding: 0px 0px 0px 10px;">
-                                    <!-- Render elements here when open dialog -->
-                                </ul>
-                            </div>
+                            <button class="btn" id="btnClose" onclick="closeFileHistory()" value="cancel" formmethod="dialog"><i class="fa fa-close"></i></button>
                         </div>
-                    </dialog>
-                </div>
-            </div>
+                    </div>
+                    <hr style="color: rgba(0, 133, 0, 0.4);" />
+                    <div>
+                        <div style="justify-content: center;">
+                            <ul id="fileList" style="padding: 0px 0px 0px 10px;">
+                                <!-- Render elements here when open dialog -->
+                            </ul>
+                        </div>
+                    </div>
+                </dialog>
+            </section>
+        </nav>
 
-        </div>
-        <div class="sub-ly" style="background-color: rgb(253, 253, 253);">
-            <div class="row-grap">
-                <div class="col-grap card" id="leftSensor">
-                    <h4>Diameter Sensor 1</h4>
-                </div>
-                <div class="col-grap card" id="rigthSensor">
-                    <h4>Diameter Sensor 2</h4>
-                </div>
-            </div>
-            <div class="row-grap">
-                <div class="col-grap card" id="heightSensor">
-                    <h4>Height Sensor</h4>
-                </div>
-                <div class="col-grap card" id="weightBal">
-                    <h4>Soil Weight</h4>
-                </div>
-            </div>
-            <div class="row-grap">
-                <div class="col-grap card" id="emisCO21">
-                    <h4>Emission (CO2-1)</h4>
-                </div>
-                <div class="col-grap card" id="emisCO22">
-                    <h4>Emission (CO2-2)</h4>
-                </div>
-            </div>
-            <div class="row-grap">
-                <div class="col-grap card" id="airHum1">
-                    <h4>Air Humidity (CO2-1)</h4>
-                </div>
-                <div class="col-grap card" id="airHum2">
-                    <h4>Air Humidity (CO2-2)</h4>
-                </div>
-            </div>
-            <div class="row-grap">
-                <div class="col-grap card" id="tmep1">
-                    <h4>Temperature (CO2-1)</h4>
-                </div>
-                <div class="col-grap card" id="tmep2">
-                    <h4>Temperature (CO2-2)</h4>
-                </div>
-            </div>
-            <div class="row-grap">
-                <div class="col-grap card" id="temp3">
-                    <h4>Temperature (DS18B20)</h4>
-                </div>
-            </div>
-        </div>
+    </header>
+    <main>
+        <section class="sub-ly" style="background-color: rgb(253, 253, 253);">
+            <section class="row-grap">
+                <div class="col-grap card" id="leftSensor"></div>
+                <div class="col-grap card" id="rigthSensor"></div>
+            </section>
+            <section class="row-grap">
+                <div class="col-grap card" id="heightSensor"></div>
+                <div class="col-grap card" id="weightBal"></div>
+            </section>
+            <section class="row-grap">
+                <div class="col-grap card" id="emisCO21"></div>
+                <div class="col-grap card" id="emisCO22"></div>
+            </section>
+            <section class="row-grap">
+                <div class="col-grap card" id="airHum1"></div>
+                <div class="col-grap card" id="airHum2"></div>
+            </section>
+            <section class="row-grap">
+                <div class="col-grap card" id="temp1"></div>
+                <div class="col-grap card" id="temp2"></div>
+            </section>
+            <section class="row-grap">
+                <div class="col-grap card" id="temp3"></div>
+                <div class="col-grap"></div>
+            </section>
+        </section>
         <hr />
-        <div class="card" style="margin: 4px;">
+        <section style="width: 100%; text-align: center; display: flex; justify-content: center; align-items: center;">
+            <div class="pagination">
+                <select name="view" id="selection">
+                    <option value="10">10</option>
+                    <option value="30">30</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                    <option value="300">300</option>
+                    <option value="400">400</option>
+                    <option value="500">500</option>
+                </select>
+                <a href="#"><img src="/static/assets/dou_left.svg" alt=""></a>
+                <a href="#"><img src="/static/assets/sin_left.svg" alt=""></a>
+                <span>Page</span><span id="currentPage">0</span><span>of</span> <span id="totalPage"> 20</span>
+                <a href="#"><img src="/static/assets/sin_right.svg" alt=""></a>
+                <a href="#"><img src="/static/assets/dou_right.svg" alt=""></a>
+            </div>
+        </section>
+        <section class="card" style="margin: 4px; max-height: 500px; overflow: auto;">
             <table id="data-table">
                 <thead>
                     <tr>
@@ -347,9 +406,8 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {%for item in data%}
-                    <tr class="tb-body">
+                <tbody id="tbody">
+                    <!-- <tr>
                         <td>{{item.date}}</td>
                         <td>{{item.diam1}}</td>
                         <td>{{item.diam2}}</td>
@@ -367,446 +425,219 @@
                                 <i class="fa-solid fa-ellipsis"></i>
                             </button>
                         </td>
-                    </tr>
-                    {%endfor%}
+                    </tr> -->
                 </tbody>
             </table>
-            <bar />
-            <nav>
-                <ul class="pagination">
-                    {%for i in range(0, 10) %}
-                    <li><a>{{i}}</a></li>
-                    {%endfor%}
-                </ul>
-            </nav>
-        </div>
-        <div>
+        </section>
+    </main>
 
-        </div>
-    </div>
+    <dialog class="details card" id="details" style=" margin: auto;">
+        <section>
+            <div style="display: flex; height: max-content;">
+                <div style="width: 100%; ">
+                    <h4 style="margin: 8px;">Show Data Details</h4>
+                </div>
+                <div>
+                    <button class="btn" id="btnCloseDetails" onclick="closeDetails()" value="cancel" formmethod="dialog"><i class="fa fa-close"></i></button>
+                </div>
+            </div>
+            <hr style="color: rgba(0, 133, 0, 0.4);" />
+            <div id="dlContext" style="display: grid; grid-template-columns: auto auto auto; gap: 10px; padding: 10px;"></div>
+        </section>
+    </dialog>
 </body>
-
-<dialog class="details card" id="details" style=" margin: auto;">
-    <div>
-        <div style="display: flex; height: max-content;">
-            <div style="width: 100%; ">
-                <h4 style="margin: 8px;">Show Data Details</h4>
-            </div>
-            <div>
-                <button class="btn" id="btnCloseDetails" value="cancel" formmethod="dialog"><i class="fa fa-close"></i></button>
-            </div>
-        </div>
-        <hr style="color: rgba(0, 133, 0, 0.4);" />
-        <div id="dlContext" style="display: grid; grid-template-columns: auto auto auto; gap: 10px; padding: 10px;"></div>
-    </div>
-</dialog>
 
 </html>
 
 <script>
+    var page = 1;
+    var perPage = 10;
+    var chart_catego = [];
+    var tbody = document.getElementById("tbody");
+    const selectElm = document.getElementById("selection");
+    perPage = selectElm.value;
+    const fileDialog = document.getElementById("fileDialog");
     const lables = [
-        { icon: "calendar.svg", name: "Date Time", unit: "" },
-        { icon: "sensor_letf.svg", name: "Diameter Sensor 1", unit: "Volt" },
-        { icon: "sensor_rigth.svg", name: "Diameter Sensor 2", unit: "Volt" },
-        { icon: "sensor_hiegth.svg", name: "High Sensor", unit: "Volt" },
-        { icon: "scale.svg", name: "Soil Weight", unit: "g" },
-        { icon: "co2_1.svg", name: "Emission (CO2-1)", unit: "ppm" },
-        { icon: "co2_2.svg", name: "Emission (CO2-2)", unit: "ppm" },
-        { icon: "air_humidity_1.svg", name: "Air Humidity (CO2-1)", unit: "%" },
-        { icon: "air_humidity_2.svg", name: "Air Humidity (CO2-2)", unit: "%" },
-        { icon: "temperature_1.svg", name: "Temperature (CO2-1)", unit: "°C" },
-        { icon: "temperature_2.svg", name: "Temperature (CO2-2)", unit: "°C" },
-        { icon: "temperature_3.svg", name: "Temperature (DS18)", unit: "°C" }
+        { id: "date", icon: "calendar.svg", name: "Date Time", unit: "", ytitle: "Date Time", data: [] },
+        { id: "leftSensor", icon: "sensor_letf.svg", name: "Diameter Sensor 1", unit: "Volt", ytitle: "Diameter", data: [] },
+        { id: "rigthSensor", icon: "sensor_rigth.svg", name: "Diameter Sensor 2", unit: "Volt", ytitle: "Diameter", data: [] },
+        { id: "heightSensor", icon: "sensor_hiegth.svg", name: "High Sensor", unit: "Volt", ytitle: "Diameter", data: [] },
+        { id: "weightBal", icon: "scale.svg", name: "Soil Weight", unit: "g", ytitle: "Weight", data: [] },
+        { id: "emisCO21", icon: "co2_1.svg", name: "Emission (CO2-1)", unit: "ppm", ytitle: "Emission", data: [] },
+        { id: "emisCO22", icon: "co2_2.svg", name: "Emission (CO2-2)", unit: "ppm", ytitle: "Emission", data: [] },
+        { id: "airHum1", icon: "air_humidity_1.svg", name: "Air Humidity (CO2-1)", unit: "%", ytitle: "Air Humidity", data: [] },
+        { id: "airHum2", icon: "air_humidity_2.svg", name: "Air Humidity (CO2-2)", unit: "%", ytitle: "Air Humidity", data: [] },
+        { id: "temp1", icon: "temperature_1.svg", name: "Temperature (CO2-1)", unit: "°C", ytitle: "Temperature", data: [] },
+        { id: "temp2", icon: "temperature_2.svg", name: "Temperature (CO2-2)", unit: "°C", ytitle: "Temperature", data: [] },
+        { id: "temp3", icon: "temperature_3.svg", name: "Temperature (DS18)", unit: "°C", ytitle: "Temperature", data: [] }
     ];
     var fileList = ["File name show here", "File name show here", "File name show here", "File name show here", "File name show here", "File name show here"];
-    function showGrap() {
 
-        var options = {
-            // colors: ["#02754b"],
-            series: [{
-                name: 'series1',
-                data: [
-                    671, 200, 944, 551, 279,
-                    986, 379, 31, 962, 132,
-                    921, 260, 567, 915, 795,
-                    970, 421, 79, 903, 103,
-                    701, 341, 232, 983, 146,
-                    574, 617, 313, 124, 189,
-                    870, 533, 798, 909, 314,
-                    846, 800, 36, 437, 434,
-                    308, 179, 382, 996, 327,
-                    310, 821, 30, 324, 131,
-                    740, 346, 993, 237, 171,
-                    741, 900, 655, 777, 123,
-                    545, 173, 881, 25, 187,
-                    838, 400, 707, 238, 815,
-                    306, 827, 372, 56, 484,
-                    313, 86, 413, 148, 590,
-                    690, 981, 584, 382, 493,
-                    773, 620, 886, 8, 455,
-                    860, 444, 762, 123, 738,
-                    665, 125, 816, 503, 58,
-                    975, 81, 645, 934, 359,
-                    960, 467, 753, 904, 44,
-                    659, 638, 219, 377, 705,
-                    611, 50, 630, 721, 332,
-                    265, 720, 489, 860, 329,
-                    943, 328, 263, 555, 662,
-                    555, 90, 412, 853, 799,
-                    860, 524, 675, 899, 226,
-                    433, 831, 347, 412, 69,
-                    632, 598, 326, 669, 935,
-                    190, 410, 917, 199, 751,
-                    652, 739, 211, 768, 540,
-                    651, 591, 796, 200, 565,
-                    98, 242, 587, 279, 578,
-                    625, 260, 76, 864, 974,
-                    596, 156, 899, 686, 30,
-                    342, 708, 865, 884, 106,
-                    587, 212, 427, 236, 111,
-                    440, 160, 799, 152, 906,
-                    477, 795, 697, 962, 603,
-                    580, 686, 942, 602, 689,
-                    922, 578, 407, 160, 665,
-                    380, 703, 713, 710, 636,
-                    396, 398, 966, 938, 180,
-                    626, 983, 41, 617, 693,
-                    591, 552, 538, 835, 963,
-                    589, 887, 784, 834, 207
-                ]
-            }],
-            chart: {
-                id: '',
-                height: 250,
-                type: 'area'
-            },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                curve: 'smooth',
-                width: 1
-            },
-            // fill: {
-            //     // colors: ['#04bf7b', "#02754b"],
-            //     type: "gradient",
-            //     gradient: {
-            //         shadeIntensity: 1,
-            //         opacityFrom: 0.7,
-            //         opacityTo: 0.9,
-            //     }
-            // },
-            xaxis: {
-                type: 'datetime',
-                categories: [
-                    "2018-09-20T00:14:00.00Z",
-                    "2018-09-20T00:22:00.00Z",
-                    "2018-09-20T00:35:00.00Z",
-                    "2018-09-20T00:56:00.00Z",
-                    "2018-09-20T01:04:00.00Z",
-                    "2018-09-20T02:01:00.00Z",
-                    "2018-09-20T02:16:00.00Z",
-                    "2018-09-20T02:23:00.00Z",
-                    "2018-09-20T02:31:00.00Z",
-                    "2018-09-20T02:34:00.00Z",
-                    "2018-09-20T02:38:00.00Z",
-                    "2018-09-20T03:03:00.00Z",
-                    "2018-09-20T03:20:00.00Z",
-                    "2018-09-20T03:46:00.00Z",
-                    "2018-09-20T04:07:00.00Z",
-                    "2018-09-20T04:37:00.00Z",
-                    "2018-09-20T05:00:00.00Z",
-                    "2018-09-20T05:28:00.00Z",
-                    "2018-09-20T05:45:00.00Z",
-                    "2018-09-20T06:08:00.00Z",
-                    "2018-09-20T06:20:00.00Z",
-                    "2018-09-20T06:26:00.00Z",
-                    "2018-09-20T06:27:00.00Z",
-                    "2018-09-20T06:58:00.00Z",
-                    "2018-09-20T07:21:00.00Z",
-                    "2018-09-20T07:25:00.00Z",
-                    "2018-09-20T07:45:00.00Z",
-                    "2018-09-20T08:05:00.00Z",
-                    "2018-09-20T08:08:00.00Z",
-                    "2018-09-20T09:36:00.00Z",
-                    "2018-09-20T09:52:00.00Z",
-                    "2018-09-20T11:11:00.00Z",
-                    "2018-09-20T11:12:00.00Z",
-                    "2018-09-20T11:35:00.00Z",
-                    "2018-09-20T12:19:00.00Z",
-                    "2018-09-20T12:37:00.00Z",
-                    "2018-09-20T12:40:00.00Z",
-                    "2018-09-20T12:44:00.00Z",
-                    "2018-09-20T13:59:00.00Z",
-                    "2018-09-20T15:47:00.00Z",
-                    "2018-09-20T16:11:00.00Z",
-                    "2018-09-20T16:25:00.00Z",
-                    "2018-09-20T16:54:00.00Z",
-                    "2018-09-20T18:19:00.00Z",
-                    "2018-09-20T18:44:00.00Z",
-                    "2018-09-20T19:06:00.00Z",
-                    "2018-09-20T19:40:00.00Z",
-                    "2018-09-20T19:42:00.00Z",
-                    "2018-09-20T19:46:00.00Z",
-                    "2018-09-20T20:19:00.00Z",
-                    "2018-09-20T20:29:00.00Z",
-                    "2018-09-20T20:39:00.00Z",
-                    "2018-09-20T20:52:00.00Z",
-                    "2018-09-20T20:53:00.00Z",
-                    "2018-09-20T21:54:00.00Z",
-                    "2018-09-20T21:58:00.00Z",
-                    "2018-09-20T22:07:00.00Z",
-                    "2018-09-20T22:44:00.00Z",
-                    "2018-09-20T23:11:00.00Z",
-                    "2018-09-20T23:33:00.00Z",
-                    "2018-09-21T00:14:00.00Z",
-                    "2018-09-21T00:22:00.00Z",
-                    "2018-09-21T00:35:00.00Z",
-                    "2018-09-21T00:56:00.00Z",
-                    "2018-09-21T01:04:00.00Z",
-                    "2018-09-21T02:01:00.00Z",
-                    "2018-09-21T02:16:00.00Z",
-                    "2018-09-21T02:23:00.00Z",
-                    "2018-09-21T02:31:00.00Z",
-                    "2018-09-21T02:34:00.00Z",
-                    "2018-09-21T02:38:00.00Z",
-                    "2018-09-21T03:03:00.00Z",
-                    "2018-09-21T03:20:00.00Z",
-                    "2018-09-21T03:46:00.00Z",
-                    "2018-09-21T04:07:00.00Z",
-                    "2018-09-21T04:37:00.00Z",
-                    "2018-09-21T05:00:00.00Z",
-                    "2018-09-21T05:28:00.00Z",
-                    "2018-09-21T05:45:00.00Z",
-                    "2018-09-21T06:08:00.00Z",
-                    "2018-09-21T06:20:00.00Z",
-                    "2018-09-21T06:26:00.00Z",
-                    "2018-09-21T06:27:00.00Z",
-                    "2018-09-21T06:58:00.00Z",
-                    "2018-09-21T07:21:00.00Z",
-                    "2018-09-21T07:25:00.00Z",
-                    "2018-09-21T07:45:00.00Z",
-                    "2018-09-21T08:05:00.00Z",
-                    "2018-09-21T08:08:00.00Z",
-                    "2018-09-21T09:36:00.00Z",
-                    "2018-09-21T09:52:00.00Z",
-                    "2018-09-21T11:11:00.00Z",
-                    "2018-09-21T11:12:00.00Z",
-                    "2018-09-21T11:35:00.00Z",
-                    "2018-09-21T12:19:00.00Z",
-                    "2018-09-21T12:37:00.00Z",
-                    "2018-09-21T12:40:00.00Z",
-                    "2018-09-21T12:44:00.00Z",
-                    "2018-09-21T13:59:00.00Z",
-                    "2018-09-21T15:47:00.00Z",
-                    "2018-09-21T16:11:00.00Z",
-                    "2018-09-21T16:25:00.00Z",
-                    "2018-09-21T16:54:00.00Z",
-                    "2018-09-21T18:19:00.00Z",
-                    "2018-09-21T18:44:00.00Z",
-                    "2018-09-21T19:06:00.00Z",
-                    "2018-09-21T19:40:00.00Z",
-                    "2018-09-21T19:42:00.00Z",
-                    "2018-09-21T19:46:00.00Z",
-                    "2018-09-21T20:19:00.00Z",
-                    "2018-09-21T20:29:00.00Z",
-                    "2018-09-21T20:39:00.00Z",
-                    "2018-09-21T20:52:00.00Z",
-                    "2018-09-21T20:53:00.00Z",
-                    "2018-09-21T21:54:00.00Z",
-                    "2018-09-21T21:58:00.00Z",
-                    "2018-09-21T22:07:00.00Z",
-                    "2018-09-21T22:44:00.00Z",
-                    "2018-09-21T23:11:00.00Z",
-                    "2018-09-21T23:33:00.00Z",
-                    "2018-09-23T00:14:00.00Z",
-                    "2018-09-23T00:22:00.00Z",
-                    "2018-09-23T00:35:00.00Z",
-                    "2018-09-23T00:56:00.00Z",
-                    "2018-09-23T01:04:00.00Z",
-                    "2018-09-23T02:01:00.00Z",
-                    "2018-09-23T02:16:00.00Z",
-                    "2018-09-23T02:23:00.00Z",
-                    "2018-09-23T02:31:00.00Z",
-                    "2018-09-23T02:34:00.00Z",
-                    "2018-09-23T02:38:00.00Z",
-                    "2018-09-23T03:03:00.00Z",
-                    "2018-09-23T03:20:00.00Z",
-                    "2018-09-23T03:46:00.00Z",
-                    "2018-09-23T04:07:00.00Z",
-                    "2018-09-23T04:37:00.00Z",
-                    "2018-09-23T05:00:00.00Z",
-                    "2018-09-23T05:28:00.00Z",
-                    "2018-09-23T05:45:00.00Z",
-                    "2018-09-23T06:08:00.00Z",
-                    "2018-09-23T06:20:00.00Z",
-                    "2018-09-23T06:26:00.00Z",
-                    "2018-09-23T06:27:00.00Z",
-                    "2018-09-23T06:58:00.00Z",
-                    "2018-09-23T07:21:00.00Z",
-                    "2018-09-23T07:25:00.00Z",
-                    "2018-09-23T07:45:00.00Z",
-                    "2018-09-23T08:05:00.00Z",
-                    "2018-09-23T08:08:00.00Z",
-                    "2018-09-23T09:36:00.00Z",
-                    "2018-09-23T09:52:00.00Z",
-                    "2018-09-23T11:11:00.00Z",
-                    "2018-09-23T11:12:00.00Z",
-                    "2018-09-23T11:35:00.00Z",
-                    "2018-09-23T12:19:00.00Z",
-                    "2018-09-23T12:37:00.00Z",
-                    "2018-09-23T12:40:00.00Z",
-                    "2018-09-23T12:44:00.00Z",
-                    "2018-09-23T13:59:00.00Z",
-                    "2018-09-23T15:47:00.00Z",
-                    "2018-09-23T16:11:00.00Z",
-                    "2018-09-23T16:25:00.00Z",
-                    "2018-09-23T16:54:00.00Z",
-                    "2018-09-23T18:19:00.00Z",
-                    "2018-09-23T18:44:00.00Z",
-                    "2018-09-23T19:06:00.00Z",
-                    "2018-09-23T19:40:00.00Z",
-                    "2018-09-23T19:42:00.00Z",
-                    "2018-09-23T19:46:00.00Z",
-                    "2018-09-23T20:19:00.00Z",
-                    "2018-09-23T20:29:00.00Z",
-                    "2018-09-23T20:39:00.00Z",
-                    "2018-09-23T20:52:00.00Z",
-                    "2018-09-23T20:53:00.00Z",
-                    "2018-09-23T21:54:00.00Z",
-                    "2018-09-23T21:58:00.00Z",
-                    "2018-09-23T22:07:00.00Z",
-                    "2018-09-23T22:44:00.00Z",
-                    "2018-09-23T23:11:00.00Z",
-                    "2018-09-23T23:33:00.00Z",
-                    "2018-09-24T00:14:00.00Z",
-                    "2018-09-24T00:22:00.00Z",
-                    "2018-09-24T00:35:00.00Z",
-                    "2018-09-24T00:56:00.00Z",
-                    "2018-09-24T01:04:00.00Z",
-                    "2018-09-24T02:01:00.00Z",
-                    "2018-09-24T02:16:00.00Z",
-                    "2018-09-24T02:23:00.00Z",
-                    "2018-09-24T02:31:00.00Z",
-                    "2018-09-24T02:34:00.00Z",
-                    "2018-09-24T02:38:00.00Z",
-                    "2018-09-24T03:03:00.00Z",
-                    "2018-09-24T03:20:00.00Z",
-                    "2018-09-24T03:46:00.00Z",
-                    "2018-09-24T04:07:00.00Z",
-                    "2018-09-24T04:37:00.00Z",
-                    "2018-09-24T05:00:00.00Z",
-                    "2018-09-24T05:28:00.00Z",
-                    "2018-09-24T05:45:00.00Z",
-                    "2018-09-24T06:08:00.00Z",
-                    "2018-09-24T06:20:00.00Z",
-                    "2018-09-24T06:26:00.00Z",
-                    "2018-09-24T06:27:00.00Z",
-                    "2018-09-24T06:58:00.00Z",
-                    "2018-09-24T07:21:00.00Z",
-                    "2018-09-24T07:25:00.00Z",
-                    "2018-09-24T07:45:00.00Z",
-                    "2018-09-24T08:05:00.00Z",
-                    "2018-09-24T08:08:00.00Z",
-                    "2018-09-24T09:36:00.00Z",
-                    "2018-09-24T09:52:00.00Z",
-                    "2018-09-24T11:11:00.00Z",
-                    "2018-09-24T11:12:00.00Z",
-                    "2018-09-24T11:35:00.00Z",
-                    "2018-09-24T12:19:00.00Z",
-                    "2018-09-24T12:37:00.00Z",
-                    "2018-09-24T12:40:00.00Z",
-                    "2018-09-24T12:44:00.00Z",
-                    "2018-09-24T13:59:00.00Z",
-                    "2018-09-24T15:47:00.00Z",
-                    "2018-09-24T16:11:00.00Z",
-                    "2018-09-24T16:25:00.00Z",
-                    "2018-09-24T16:54:00.00Z",
-                    "2018-09-24T18:19:00.00Z",
-                    "2018-09-24T18:44:00.00Z",
-                    "2018-09-24T19:06:00.00Z",
-                    "2018-09-24T19:40:00.00Z",
-                    "2018-09-24T19:42:00.00Z",
-                    "2018-09-24T19:46:00.00Z",
-                    "2018-09-24T20:19:00.00Z",
-                    "2018-09-24T20:29:00.00Z",
-                    "2018-09-24T20:39:00.00Z",
-                    "2018-09-24T20:52:00.00Z",
-                    "2018-09-24T20:53:00.00Z",
-                    "2018-09-24T21:54:00.00Z",
-                    "2018-09-24T21:58:00.00Z",
-                    "2018-09-24T22:07:00.00Z",
-                    "2018-09-24T22:44:00.00Z",
-                    "2018-09-24T23:11:00.00Z",
-                    "2018-09-24T23:33:00.00Z"
-                ]
-            },
-            tooltip: {
-                x: {
-                    format: 'dd/MM/yy HH:mm'
-                },
-            },
-        };
+    document.getElementById('currentPage').innerHTML = `Page ${data.page} of ${data.perPage}`;
+    // function fillDataChart() {
 
-        var leftSensorOp = { ...options };
-        leftSensorOp.chart.id = "leftSensor";
-        var chartL = new ApexCharts(document.getElementById("leftSensor"), leftSensorOp);
-        chartL.render();
+    //     // for (item of data.data) {
+    //     //     diam1_chart.push(parseFloat(item.diam1));
+    //     //     diam2_chart.push(parseFloat(item.diam2));
+    //     //     h_chart.push(parseFloat(item.height));
+    //     //     w_chart.push(parseFloat(item.wieght));
+    //     //     emiss1_chart.push(parseFloat(item.emiss1));
+    //     //     emiss2_chart.push(parseFloat(item.emiss2));
+    //     //     air1_chart.push(parseFloat(item.airh1));
+    //     //     air2_chart.push(parseFloat(item.airh2));
+    //     //     temp1_chart.push(parseFloat(item.temp1));
+    //     //     temp2_chart.push(parseFloat(item.temp2));
+    //     //     temp3_chart.push(parseFloat(item.temp3));
+    //     //     chart_catego.push(new Date(item.date).toISOString());
+    //     // }
 
-        var rigthSensorOp = { ...options };
-        rigthSensorOp.chart.id = "rigthSensor";
-        var chartL = new ApexCharts(document.getElementById("rigthSensor"), rigthSensorOp);
-        chartL.render();
+    //     for (index, item of lables) {
+    //         if (index == 0) continue;
+    //         renderChart(item.id, item.name, lables[0].data, item.data, `Diameter (${item.unit})`);
+    //         // renderChart('rigthSensor', lables[2].name, chart_catego, diam2_chart, `Diameter (${lables[2].unit})`);
+    //         // renderChart('heightSensor', lables[3].name, chart_catego, h_chart, `Diameter (${lables[3].unit})`);
+    //         // renderChart('weightBal', lables[4].name, chart_catego, w_chart, `Weight (${lables[4].unit})`);
+    //         // renderChart('emisCO21', lables[5].name, chart_catego, emiss1_chart, `Emission (${lables[5].unit})`);
+    //         // renderChart('emisCO22', lables[6].name, chart_catego, emiss2_chart, `Emission (${lables[6].unit})`);
+    //         // renderChart('airHum1', lables[7].name, chart_catego, air1_chart, `Air Humidity (${lables[7].unit})`);
+    //         // renderChart('airHum2', lables[8].name, chart_catego, air2_chart, `Air Humidity (${lables[8].unit})`);
+    //         // renderChart('temp1', lables[9].name, chart_catego, temp1_chart, `Temperature (${lables[9].unit})`);
+    //         // renderChart('temp2', lables[10].name, chart_catego, temp2_chart, `Temperature (${lables[10].unit})`);
+    //         // renderChart('temp3', lables[11].name, chart_catego, temp3_chart, `Temperature (°${lables[11].unit})`);
+    //     }
+    // }
 
-        var heightSensorOp = { ...options };
-        heightSensorOp.chart.id = "heightSensor";
-        var chartH = new ApexCharts(document.getElementById("heightSensor"), heightSensorOp);
-        chartH.render();
-
-        var weightBalOp = { ...options };
-        weightBalOp.chart.id = "weightBal";
-        var chartH = new ApexCharts(document.getElementById("weightBal"), weightBalOp);
-        chartH.render();
-
-        var emisCO21Op = { ...options };
-        emisCO21Op.chart.id = "emisCO21";
-        var chartH = new ApexCharts(document.getElementById("emisCO21"), emisCO21Op);
-        chartH.render();
-
-        var emisCO22Op = { ...options };
-        emisCO22Op.chart.id = "emisCO22";
-        var chartH = new ApexCharts(document.getElementById("emisCO22"), emisCO22Op);
-        chartH.render();
-
-        var airHum1Op = { ...options };
-        airHum1Op.chart.id = "airHum1";
-        var chartH = new ApexCharts(document.getElementById("airHum1"), airHum1Op);
-        chartH.render();
-
-        var airHum2Op = { ...options };
-        airHum2Op.chart.id = "airHum2";
-        var chartH = new ApexCharts(document.getElementById("airHum2"), airHum2Op);
-        chartH.render();
-
-        var tmep1Op = { ...options };
-        tmep1Op.chart.id = "tmep1";
-        var chartH = new ApexCharts(document.getElementById("tmep1"), tmep1Op);
-        chartH.render();
-
-        var tmep2Op = { ...options };
-        tmep2Op.chart.id = "tmep2";
-        var chartH = new ApexCharts(document.getElementById("tmep2"), tmep2Op);
-        chartH.render();
-
-        var temp3Op = { ...options };
-        temp3Op.chart.id = "temp3";
-        var chartH = new ApexCharts(document.getElementById("temp3"), temp3Op);
-        chartH.render();
+    function clearData() {
+        lables[0].data = [];
+        lables[1].data = [];
+        lables[2].data = [];
+        lables[3].data = [];
+        lables[4].data = [];
+        lables[5].data = [];
+        lables[6].data = [];
+        lables[7].data = [];
+        lables[8].data = [];
+        lables[9].data = [];
+        lables[10].data = [];
+        lables[11].data = [];
     }
 
-    showGrap();
+    function renderChart() {
+        for (let index = 1; index < lables.length; index++) {
+            const options = {
+                // colors: ["#02754b"],
+                title: { text: lables[index].name, align: "left" },
+                series: [{
+                    name: lables[index].name,
+                    data: lables[index].data
+                }],
+                chart: {
+                    id: lables[index].id,
+                    height: 250,
+                    type: 'area'
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 1
+                },
+                xaxis: {
+                    type: 'datetime',
+                    categories: lables[0].data
+                },
+                yaxis: {
+                    title: {
+                        text: `${lables[index].ytitle} (${lables[index].unit})`,
+                        style: {
+                            fontSize: "10px",
+                        },
+                    },
+                },
+                tooltip: {
+                    x: {
+                        format: 'dd/MM/yy HH:mm:ss'
+                    },
+                },
+            };
+
+            let chartElement = document.getElementById(chart_id);
+            chartElement.innerHTML = null;
+            var chart = new ApexCharts(chartElement, options);
+            chart.render();
+        }
+    }
+
+    async function fetchData(page, perPage) {
+        let res_data = null;
+        try {
+            res_data = await fetch('/data', {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ page: data.page - 1, perPage: data.perPage })
+            }).then(response => response.json());
+        } catch (error) {
+            console.log(error);
+            alert("Loading data error: " + e);
+        }
+
+        return res_data;
+    }
+
+    async function previousPage(page) {
+        if (page <= 1)
+            return;
+        const res_data = await fetchData(page - 1, data.perPage);
+        if (res_data == null) return alert("No data");
+        page = res_data.page;
+        perPage = res_data.perPage;
+        clearData();
+        tbody.innerHTML = null;
+        for (const item of res_data.data) {
+            lables[0].data.push(new Date(item.date).toISOString());
+            lables[1].data.push(parseFloat(item.diam1));
+            lables[2].data.push(parseFloat(item.diam2));
+            lables[3].data.push(parseFloat(item.height));
+            lables[4].data.push(parseFloat(item.wieght));
+            lables[5].data.push(parseFloat(item.emiss1));
+            lables[6].data.push(parseFloat(item.emiss2));
+            lables[7].data.push(parseFloat(item.airh1));
+            lables[8].data.push(parseFloat(item.airh2));
+            lables[9].data.push(parseFloat(item.temp1));
+            lables[10].data.push(parseFloat(item.temp2));
+            lables[11].data.push(parseFloat(item.temp3));
+
+            let tr = document.createElement('tr');
+            tr.innerHTML = `<td>${item.date}</td>
+                        <td>${item.diam1}</td>
+                        <td>${item.diam2}</td>
+                        <td>${item.high}</td>
+                        <td>${item.wieght}</td>
+                        <td>${item.emiss1}</td>
+                        <td>${item.emiss2}</td>
+                        <td>${item.airh1}</td>
+                        <td>${item.airh2}</td>
+                        <td>${item.temp1}</td>
+                        <td>${item.temp2}</td>
+                        <td>${item.temp3}</td>
+                        <td>
+                            <button class="button btn-detail" onclick="shoRowDetails(this)">
+                                <i class="fa-solid fa-ellipsis"></i>
+                            </button>
+                        </td>`;
+
+            tbody.append();
+        }
+    }
+
+    function nextPage(page) {
+
+    }
+
 
     //Details Dialog Script
+
     function shoRowDetails(click) {
         //   const dataTable = document.getElementById("data-table");
         // dataTable.addEventListener('click', (e) => {
@@ -819,7 +650,7 @@
         for (const key in rowData) {
             let listCtx = document.createElement('div');
             // listCtx.className = 'card';
-            listCtx.style.cssText = "border-radius: 4px; margin: 4px; padding: 2px; width: 180px; height: 80px; background-color:#E3E8E6; ";
+            listCtx.style.cssText = "border-radius: 4px; margin: 4px; padding: 2px; width: 190px; height: 90px; background-color:#E3E8E6; ";
 
             let title = document.createElement('div');
             title.style.cssText = "display: flex; justify-items: center; align-items: center;";
@@ -847,13 +678,9 @@
 
     }
 
-    document.getElementById('btnCloseDetails').addEventListener("click", () => {
+    function closeDetails() {
         document.getElementById('details').close();
-    });
-
-    // Files History Dialog Script
-    const fileDialog = document.getElementById("fileDialog");
-    const closeBtn = document.getElementById("btnClose");
+    }
 
     // "Show the dialog" button opens the <dialog> modally
     function showFileHistory() {
@@ -895,10 +722,9 @@
         fileDialog.showModal();
     }
 
-    // Close dialog
-    closeBtn.addEventListener('click', () => {
+    function closeFileHistory() {
         fileDialog.close();
-    });
+    }
 
     // "Cancel" button closes the dialog without submitting because of [formmethod="dialog"], triggering a close event.
     fileDialog.addEventListener("close", (e) => {
