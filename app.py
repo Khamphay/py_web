@@ -76,21 +76,22 @@ def hello():
 
 @app.route("/data", methods=["POST", "GET"])
 def data():
-
-    date = request.args.get("date", None)
+    body = request.json
+    date = body["date"]
     if date is not None and date != "null":
         orig_date = datetime.strptime(date, "%Y-%m-%d")
         date = datetime.strftime(orig_date, "%d-%m-%Y")
     else:
         date = None
-    page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("perPage", 500, type=int)
-    end = per_page * page
-    start = (end - per_page) + 1
+    page = body["page"]
+    per_page = body["perPage"]
+    end = int(per_page) * int(page)
+    start = (end - per_page) + 1  # Skill the header line
 
     json_data = read_csv_file(start, end, date)
     json_data["page"] = page
     json_data["perPage"] = per_page
+    json_data["isRecording"] = False
 
     return jsonify(json_data)
 

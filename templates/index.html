@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Noto Sans Lao">
     <!-- <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script> -->
     <script rel="preload" src="/static/dist/apexcharts.js"></script>
+    <script rel="preload" src="/static/swalert/swalert.js"></script>
+
 
     <style>
         * {
@@ -301,6 +303,14 @@
             padding: 0.6rem;
         }
 
+        .file:hover {
+            background-color: #1891465f;
+        }
+
+        .file:active {
+            background-color: #04a429a4;
+        }
+
         .pagination {
             display: flex;
             justify-content: center;
@@ -356,13 +366,13 @@
                 <div><button class="button" onclick="onRefreshClick()">Refresh</button></div>
                 <div>
                     <label>File name:</label>
-                    <input type="text" id="fileName" style="height: 30px; border-radius: 6px;">
+                    <input type="text" id="fileName" onkeypress="return !(/[!@#$%^&*()+\=\[\]{};: \\|,.<>\/?]+/i.test(event.key))" style="height: 30px; border-radius: 6px;">
                 </div>
                 <div style="width: fix-content;">
                     <label>Timer (minutes):</label>
                     <input type="text" id="interval" maxlength="4" onkeypress="return /[0-9]/i.test(event.key)" min="1" max="120" style="height: 30px; width: 60px; border-radius: 6px;">
                 </div>
-                <div> <button class="button" onclick="recordData()">Record</button></div>
+                <div> <button class="button" id="btn_record" onclick="recordData()">Record</button></div>
                 <div><button class="button" onclick="showFileHistory()">Files</button></div>
                 <div>
                     <a href="{{url_for('monitor')}}">
@@ -421,7 +431,7 @@
         <hr />
         <section style="width: 100%; text-align: center; display: flex; justify-content: center; align-items: center;">
             <div class="pagination">
-                <select onchange="onSelectChange()" name="view" id="selection">
+                <select onchange="onSelectView()" name="view" id="selection">
                     <option value="10">10</option>
                     <option value="30">30</option>
                     <option value="50">50</option>
@@ -495,11 +505,13 @@
 </html>
 
 <script>
-    const formatdate = new Intl.DateTimeFormat('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    var recording = false;
     var page = 1;
     var totalPage = 10;
     var onDate = null;
     var chart_catego = [];
+    var file_name = null;
+    var btnRecord = document.getElementById('btn_record');
     var tbody = document.getElementById("tbody");
     var currentPage = document.getElementById('currentPage');
     var totalPageElm = document.getElementById('totalPage');
@@ -584,53 +596,115 @@
         }
     }
 
-    function recordData() {
+    async function recordData() {
         try {
+            if (recording == true) {
+                const response = await fetch(`/stop`);
+                if (!response.ok) {
+                    alertDialog("warning", response.statusText);
+                    return;
+                }
+                const rs = response.json();
+                alertDialog("success", rs?.result ?? "Stop recording data");
+                btnRecord.textContent = "Record";
+                return;
+            }
+
             const fileName = document.getElementById("fileName");
             const interval = document.getElementById("interval");
-            if (fileName.value == "" || parseInt(interval.value ?? 0) >= 0)
-                return alert("Please check the file name or timer.");
+            if (fileName.value == "" || parseInt(interval.value ?? 0) <= 0)
+                return boxDialog("warning", "Warning!", "Please check the file name or timer and try again." + fileName.value + " " + interval.value);
             const timer = parseInt(interval.value) * 60;
 
-            fetch(`/start/${timer}/${fileName.value}`).then(response => response.json()).then(data => alert(data));
+            const response = await fetch(`/start/${timer}/${fileName.value}`);
+            if (!response.ok) {
+                alertDialog("warning", response.statusText);
+                return;
+            }
+            const rs = response.json();
+            alertDialog("success", rs?.result ?? "Recording data");
+            btnRecord.textContent = "Stop";
+
         } catch (error) {
-            console.log(error);
-            alert("Save data error: " + e);
+            console.error(error);
+            boxDialog("error", "Save data error", error);
         }
     }
 
     async function dowloadFile(evt) {
-        let fileName = Array.from(evt.parentNode.parentNode.children).slice(0, -1)[0].textContent;
-        console.log(fileName);
+        try {
+            const selectFile = Array.from(evt.parentNode.parentNode.children).slice(0, -1)[0].textContent;
+            await fetch(`/download/${selectFile.split('.')[0]}`).then(response => response.blob()).then(blod => {
+                const url = window.URL.createObjectURL(blod);
+                const a = document.createElement('a');
+                a.href = url;
+                a.setAttribute('download', selectFile);
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                alertDialog("success", "Delete file successfully");
+            });
+        } catch (error) {
+            console.error(error);
+            boxDialog("error", "Download file error", error);
+        }
     }
 
     async function deleteFile(evt) {
         try {
-            let fileName = Array.from(evt.parentNode.parentNode.children).slice(0, -1)[0].textContent;
-            await fetch(`/delete/${fileName}`).then(response => response.json()).then(data => data);
+            const selectFile = Array.from(evt.parentNode.parentNode.children).slice(0, -1)[0].textContent;
+            closeFileHistory();
+            Swal.fire({
+                title: `Are you sure ?`,
+                text: `You won't be able to revert the file ${selectFile}`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "rgb(60, 160, 107)",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/delete/${selectFile.split('.')[0]}`).then(response => response.json()).then(data => data);
+                    alertDialog("success", "Delete file successfully");
+                    showFileHistory();
+                }
+            });
         } catch (error) {
-            console.log(error);
-            alert("Delete file error: " + e);
+            console.error(error);
+            boxDialog("error", "Delete file error", error);
         }
     }
 
     async function readFileHistory() {
         try {
-            const files = await fetch('/get/history').then(response => response.json()).then(data => data);
-            return files;
+            const files = await fetch('/get/history');
+            if (!files.ok) {
+                boxDialog("warning", files.statusText);
+                return null;
+            }
+            return files.json();
         } catch (error) {
-            console.log(error);
-            alert("List files error: " + e);
+            console.error(error);
+            boxDialog("error", "List files error", error);
         }
     }
 
     async function fetchData(onPage) {
         let res_data = null;
         try {
-            res_data = await fetch(`/data?page=${onPage}&perPage=${parseInt(selectElm.value ?? 10)}&date=${onDate}`).then(response => response.json()).then(data => data);
+            res_data = await fetch(`/data`, {
+                method: "POST",
+                headers: { "Content-Type": 'application/json' },
+                body: JSON.stringify({
+                    fileName: file_name,
+                    page: onPage,
+                    perPage: parseInt(selectElm.value ?? 10),
+                    date: onDate
+                })
+            }).then(response => response.json()).then(data => data);
         } catch (error) {
-            console.log(error);
-            alert("Loading data error: " + e);
+            console.error(error);
+            alertDialog("error", "Loading data error", error);
         }
         return res_data;
     }
@@ -656,11 +730,18 @@
     }
 
     async function fillData(onPage) {
+        onLoading(true);
         try {
-            onLoading(true);
             const res_data = await fetchData(onPage);
-            if (res_data == null) return alert("No data");
+            if (res_data == null) return alertDialog("warning", "No data", error);
             clearData();
+            recording = res_data.isRecording ?? false;
+            if (recording == true) {
+                btnRecord.textContent = "Stop";
+            } else {
+                btnRecord.textContent = "Record";
+            }
+
             currentPage.innerHTML = page;
             totalPageElm.innerHTML = totalPage = Math.ceil(parseInt(res_data.total) / parseInt(selectElm.value));
             tbody.innerHTML = null;
@@ -678,7 +759,6 @@
                 lables[9].data.push(parseFloat(item.temp1));
                 lables[10].data.push(parseFloat(item.temp2));
                 lables[11].data.push(parseFloat(item.temp3));
-
                 let trow = document.createElement('tr');
                 trow.innerHTML = `<td>${item.date}</td>
                         <td>${item.diam1}</td>
@@ -699,12 +779,13 @@
                         </td>`;
                 tbody.appendChild(trow);
             }
-
             renderChart();
             onLoading(false);
         } catch (error) {
-            console.log(error);
-            alert("Fill data error: " + error);
+            console.error(error);
+            boxDialog("error", "Fill data error", error);
+            onLoading(false);
+        } finally {
             onLoading(false);
         }
     }
@@ -722,8 +803,19 @@
         fillData(page);
     }
 
-    function onSelectChange() {
+    function onSelectView() {
         fillData(page);
+    }
+
+    function onSelectFile(evt) {
+        try {
+            file_name = Array.from(evt.parentNode.children)[0].textContent;
+            document.getElementById("fileName").value = file_name.split('.')[0];
+            closeFileHistory();
+        } catch (error) {
+            console.error(error);
+            boxDialog("error", "Select file error", error);
+        }
     }
 
     //Details Dialog Script
@@ -740,19 +832,15 @@
             let listCtx = document.createElement('div');
             // listCtx.className = 'card';
             listCtx.style.cssText = "border-radius: 4px; margin: 4px; padding: 2px; width: 190px; height: 90px; background-color:#E3E8E6; ";
-
             let title = document.createElement('div');
             title.style.cssText = "display: flex; justify-items: center; align-items: center;";
-
             let text = document.createElement('h4');
             text.innerHTML = lables[key].name;
-
             let icon = document.createElement("img");
             // icon.className = `fa-solid ${lables[key].icon} fa-2xl`;
             icon.src = `/static/assets/${lables[key].icon}`;
             icon.style.cssText = "margin: 6px; color: rgba(31, 139, 82); width: 30px; height: 30px;";
             title.append(icon, text);
-
             let val = document.createElement('h3');
             val.style.cssText = "margin-top: 4px; text-align: center; ";
             val.innerHTML = `${rowData[key]} ${lables[key].unit}`;
@@ -773,40 +861,40 @@
 
     // "Show the dialog" button opens the <dialog> modally
     async function showFileHistory() {
-        const fileList = ["wuhu4tqow;", "owfhwo;eifn    we"]; //await readFileHistory();
-        var ulList = document.getElementById('fileList');
-        ulList.innerHTML = null;
+        onLoading(true);
+        try {
+            const fileList = ["wrytq304879r", "o837ry2309yr8"];// await readFileHistory();
+            var ulList = document.getElementById('fileList');
+            ulList.innerHTML = null;
+            if (fileList == null || fileList?.length == 0) {
+                ulList.innerHTML = '<li style="list-style: none;"><div style="text-align:center;">Not found files</div></li>';
+            } else {
+                fileList.map(val => {
+                    var li = document.createElement('li');
+                    li.style.cssText = "list-style: none;";
+                    li.innerHTML = `<div class="listName" style="display: flex; justify-items: center; align-items: center;">
+                        <div class="file" onclick="onSelectFile(this)" style="width: 70%;">${val}</div>
+                        <div style="width: 20%; text-align: center;">
+                            <button class="btn-dow" onclick="dowloadFile(this)"><i class="fa fa-download"></i></button>
+                            <button class="btn" onclick="deleteFile(this)"><i class="fa fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                    ulList.appendChild(li);
+                });
+            }
 
-        fileList.map(val => {
-            var li = document.createElement('li');
-            li.style.cssText = "list-style: none;";
-            li.innerHTML = `
-                <div style="display: flex; justify-items: center; align-items: center;">
-                    <div class="file" style="width: 70%;">${val}</div>
-                    <div style="width: 20%; text-align: center;">
-                        <button class="btn-dow" onclick="dowloadFile(this)"><i class="fa fa-download"></i></button>
-                        <button class="btn" onclick="deleteFile(this)"><i class="fa fa-trash"></i></button>
-                    </div>
-                </div>
-                `;
-
-            ulList.appendChild(li);
-        });
-
-        fileDialog.showModal();
+            fileDialog.showModal();
+        } catch (error) {
+            console.error(error);
+            boxDialog("error", "List files error", error);
+        } finally {
+            onLoading(false);
+        }
     }
 
     function closeFileHistory() {
         fileDialog.close();
     }
-
-    // "Cancel" button closes the dialog without submitting because of [formmethod="dialog"], triggering a close event.
-    fileDialog.addEventListener("close", (e) => {
-        // outputBox.value =
-        //     fileDialog.returnValue === "default"
-        //         ? "No return value."
-        //         : `ReturnValue: ${fileDialog.returnValue}.`; // Have to check for "default" rather than empty string
-    });
 
     function onLoading(preloading) {
         if (preloading == true)
@@ -814,4 +902,28 @@
         else
             document.getElementById("overlay").style.display = "none";
     }
+
+    function alertDialog(icon, title, text, timer) {
+        Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: timer ?? 3000,
+        }).fire({
+            icon: icon ?? 'info',
+            title: title ?? '',
+            text: text ?? null
+        });
+    }
+
+    function boxDialog(icon, title, text) {
+        Swal.fire({
+            title: title ?? "Dialog",
+            text: text ?? null,
+            icon: icon ?? "infor",
+            confirmButtonColor: "rgb(60, 160, 107)",
+            confirmButtonText: "OK"
+        });
+    }
+
 </script>
