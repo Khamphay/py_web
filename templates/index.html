@@ -35,6 +35,54 @@
             width: 100%;
         }
 
+        .overlay {
+            position: fixed;
+            display: none;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(186, 186, 186, 0.4);
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+        }
+
+        @keyframes animation {
+            0% {
+                stroke-dasharray: 1 98;
+                stroke-dashoffset: -105;
+            }
+
+            50% {
+                stroke-dasharray: 80 10;
+                stroke-dashoffset: -160;
+            }
+
+            100% {
+                stroke-dasharray: 1 98;
+                stroke-dashoffset: -300;
+            }
+        }
+
+        #spinner {
+            transform-origin: center;
+            animation-name: animation;
+            animation-duration: 1.2s;
+            animation-timing-function: cubic-bezier;
+            animation-iteration-count: infinite;
+        }
+
         input {
             padding: 6px 6px;
         }
@@ -383,11 +431,11 @@
                     <option value="400">400</option>
                     <option value="500">500</option>
                 </select>
-                <button><img src="/static/assets/dou_left.svg" alt=""></button>
-                <button onclick="previousPage()"><img src="/static/assets/sin_left.svg" alt=""></button>
+                <button onclick="previousPage(true)"><img src="/static/assets/dou_left.svg" alt=""></button>
+                <button onclick="previousPage(false)"><img src="/static/assets/sin_left.svg" alt=""></button>
                 <span>Page</span><span id="currentPage">0</span><span>of</span> <span id="totalPage"> 20</span>
-                <button onclick="nextPage()"><img src="/static/assets/sin_right.svg" alt=""></button>
-                <button><img src="/static/assets/dou_right.svg" alt=""></button>
+                <button onclick="nextPage(false)"><img src="/static/assets/sin_right.svg" alt=""></button>
+                <button onclick="nextPage(true)"><img src="/static/assets/dou_right.svg" alt=""></button>
             </div>
         </section>
         <section class="card" style="margin-bottom: 8px; padding: 4px; max-height: 500px; overflow: auto;">
@@ -415,6 +463,19 @@
         </section>
     </main>
 
+    <div class="overlay" id="overlay">
+        <div class="container">
+            <svg viewBox="0 0 100 100">
+                <defs>
+                    <filter id="shadow">
+                        <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#0f982f" />
+                    </filter>
+                </defs>
+                <circle id="spinner" style="fill:transparent;stroke:#0f982f;stroke-width: 7px;stroke-linecap: round;filter:url(#shadow);" cx="50" cy="50" r="45" />
+            </svg>
+            <h4 style="text-align: center;">Loading...</h4>
+        </div>
+    </div>
     <dialog class="details card" id="details" style=" margin: auto;">
         <section>
             <div style="display: flex; height: max-content;">
@@ -434,6 +495,7 @@
 </html>
 
 <script>
+    const formatdate = new Intl.DateTimeFormat('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
     var page = 1;
     var totalPage = 10;
     var onDate = null;
@@ -565,11 +627,7 @@
     async function fetchData(onPage) {
         let res_data = null;
         try {
-            res_data = await fetch(`/data?page=${onPage}&perPage=${parseInt(selectElm.value ?? 10)}&date=${onDate}`, {
-                // method: "POST",
-                // headers: { 'Content-Type': 'application/json' },
-                // body: JSON.stringify({ page: onPage, perPage: showPerPage })
-            }).then(response => response.json()).then(data => data);
+            res_data = await fetch(`/data?page=${onPage}&perPage=${parseInt(selectElm.value ?? 10)}&date=${onDate}`).then(response => response.json()).then(data => data);
         } catch (error) {
             console.log(error);
             alert("Loading data error: " + e);
@@ -577,43 +635,52 @@
         return res_data;
     }
 
-    async function previousPage() {
+    async function previousPage(start) {
         if (page <= 1)
             return;
-        page = page - 1;
+        if (start == true)
+            page = 1;
+        else
+            page = page - 1;
         fillData(page);
     }
 
-    async function nextPage() {
+    async function nextPage(end) {
         if (page >= totalPage)
             return;
-        page = page + 1;
+        if (end == true)
+            page = totalPage;
+        else
+            page = page + 1;
         fillData(page);
     }
 
     async function fillData(onPage) {
-        const res_data = await fetchData(onPage);
-        if (res_data == null) return alert("No data");
-        clearData();
-        currentPage.innerHTML = page;
-        totalPageElm.innerHTML = totalPage = Math.ceil(parseInt(res_data.total) / parseInt(selectElm.value));
-        tbody.innerHTML = null;
-        for (const item of res_data.data) {
-            lables[0].data.push(new Date(item.date).toISOString());
-            lables[1].data.push(parseFloat(item.diam1));
-            lables[2].data.push(parseFloat(item.diam2));
-            lables[3].data.push(parseFloat(item.height));
-            lables[4].data.push(parseFloat(item.wieght));
-            lables[5].data.push(parseFloat(item.emiss1));
-            lables[6].data.push(parseFloat(item.emiss2));
-            lables[7].data.push(parseFloat(item.airh1));
-            lables[8].data.push(parseFloat(item.airh2));
-            lables[9].data.push(parseFloat(item.temp1));
-            lables[10].data.push(parseFloat(item.temp2));
-            lables[11].data.push(parseFloat(item.temp3));
+        try {
+            onLoading(true);
+            const res_data = await fetchData(onPage);
+            if (res_data == null) return alert("No data");
+            clearData();
+            currentPage.innerHTML = page;
+            totalPageElm.innerHTML = totalPage = Math.ceil(parseInt(res_data.total) / parseInt(selectElm.value));
+            tbody.innerHTML = null;
+            for (const item of res_data.data) {
+                let date = item.date.split(/[\s-:]/);
+                lables[0].data.push(new Date(date[2], date[1], date[0], date[3], date[4], date[5]).toISOString());
+                lables[1].data.push(parseFloat(item.diam1));
+                lables[2].data.push(parseFloat(item.diam2));
+                lables[3].data.push(parseFloat(item.height));
+                lables[4].data.push(parseFloat(item.wieght));
+                lables[5].data.push(parseFloat(item.emiss1));
+                lables[6].data.push(parseFloat(item.emiss2));
+                lables[7].data.push(parseFloat(item.airh1));
+                lables[8].data.push(parseFloat(item.airh2));
+                lables[9].data.push(parseFloat(item.temp1));
+                lables[10].data.push(parseFloat(item.temp2));
+                lables[11].data.push(parseFloat(item.temp3));
 
-            let trow = document.createElement('tr');
-            trow.innerHTML = `<td>${item.date}</td>
+                let trow = document.createElement('tr');
+                trow.innerHTML = `<td>${item.date}</td>
                         <td>${item.diam1}</td>
                         <td>${item.diam2}</td>
                         <td>${item.height}</td>
@@ -630,15 +697,24 @@
                                 <i class="fa-solid fa-ellipsis"></i>
                             </button>
                         </td>`;
-            tbody.appendChild(trow);
-        }
+                tbody.appendChild(trow);
+            }
 
-        renderChart();
+            renderChart();
+            onLoading(false);
+        } catch (error) {
+            console.log(error);
+            alert("Fill data error: " + error);
+            onLoading(false);
+        }
     }
 
     function onDateChange() {
         const dateElm = document.getElementById("dateTime");
-        onDate = dateElm.value;
+        if (dateElm.value == null && dateElm.value == '')
+            onDate = null;
+        else
+            onDate = new Date(dateElm.value).toISOString().split('T')[0];
     }
 
     function onRefreshClick() {
@@ -731,4 +807,11 @@
         //         ? "No return value."
         //         : `ReturnValue: ${fileDialog.returnValue}.`; // Have to check for "default" rather than empty string
     });
+
+    function onLoading(preloading) {
+        if (preloading == true)
+            document.getElementById('overlay').style.display = 'block';
+        else
+            document.getElementById("overlay").style.display = "none";
+    }
 </script>
