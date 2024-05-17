@@ -24,4 +24,5 @@ deactivate
 ```
 pip3 install Flask Flask-Cors
 pip install flask-compress
+sudo pip3 install simple-websocket
 ```
