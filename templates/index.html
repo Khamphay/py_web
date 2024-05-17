@@ -537,6 +537,21 @@
         }
     }
 
+    async function dowloadFile(evt) {
+        let fileName = Array.from(evt.parentNode.parentNode.children).slice(0, -1)[0].textContent;
+        console.log(fileName);
+    }
+
+    async function deleteFile(evt) {
+        try {
+            let fileName = Array.from(evt.parentNode.parentNode.children).slice(0, -1)[0].textContent;
+            await fetch(`/delete/${fileName}`).then(response => response.json()).then(data => data);
+        } catch (error) {
+            console.log(error);
+            alert("Delete file error: " + e);
+        }
+    }
+
     async function readFileHistory() {
         try {
             const files = await fetch('/get/history').then(response => response.json()).then(data => data);
@@ -546,8 +561,6 @@
             alert("List files error: " + e);
         }
     }
-
-
 
     async function fetchData(onPage) {
         let res_data = null;
@@ -638,12 +651,12 @@
     }
 
     //Details Dialog Script
-    function shoRowDetails(click) {
+    function shoRowDetails(evt) {
         //   const dataTable = document.getElementById("data-table");
         // dataTable.addEventListener('click', (e) => {
         // if (e.target.parentNode.children[11] === 'button') {
         // var row = e.target.parentNode;
-        var row = click.parentNode.parentNode;
+        var row = evt.parentNode.parentNode;
         var rowData = Array.from(row.children).slice(0, -1).map(td => td.textContent);
         var dialogContext = document.getElementById('dlContext');
         dialogContext.innerHTML = null;
@@ -684,39 +697,23 @@
 
     // "Show the dialog" button opens the <dialog> modally
     async function showFileHistory() {
-        const fileList = await readFileHistory();
+        const fileList = ["wuhu4tqow;", "owfhwo;eifn    we"]; //await readFileHistory();
         var ulList = document.getElementById('fileList');
         ulList.innerHTML = null;
 
         fileList.map(val => {
-            var mdiv = document.createElement('div');
-            mdiv.style.cssText = "display: flex; justify-items: center; align-items: center";
-
-            let divFileName = document.createElement('div');
-            divFileName.innerHTML = val;
-            divFileName.className = "file";
-            divFileName.style.cssText = "width: 70%;";
-
-            let iconDow = document.createElement('i');
-            iconDow.className = 'fa fa-download';
-            let btnDowload = document.createElement('button');
-            btnDowload.className = "btn-dow";
-            btnDowload.appendChild(iconDow);
-
-            let iconDel = document.createElement('i');
-            iconDel.className = 'fa fa-trash';
-            let btnDelete = document.createElement('button');
-            btnDelete.className = "btn";
-            btnDelete.appendChild(iconDel);
-
-            let divBtn = document.createElement('div');
-            divBtn.style.cssText = "width: 20%; text-align: center;";
-            divBtn.append(btnDowload, btnDelete);
-            mdiv.append(divFileName, divBtn);
-
             var li = document.createElement('li');
             li.style.cssText = "list-style: none;";
-            li.appendChild(mdiv);
+            li.innerHTML = `
+                <div style="display: flex; justify-items: center; align-items: center;">
+                    <div class="file" style="width: 70%;">${val}</div>
+                    <div style="width: 20%; text-align: center;">
+                        <button class="btn-dow" onclick="dowloadFile(this)"><i class="fa fa-download"></i></button>
+                        <button class="btn" onclick="deleteFile(this)"><i class="fa fa-trash"></i></button>
+                    </div>
+                </div>
+                `;
+
             ulList.appendChild(li);
         });
 
