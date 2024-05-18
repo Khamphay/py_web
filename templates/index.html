@@ -11,8 +11,8 @@
     <link href="/website/css/uicons-solid-rounded.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Noto Sans Lao">
     <!-- <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script> -->
-    <script rel="preload" src="/static/dist/apexcharts.js"></script>
-    <script rel="preload" src="/static/swalert/swalert.js"></script>
+    <script src="/static/dist/apexcharts.js"></script>
+    <script src="/static/swalert/swalert.js"></script>
 
 
     <style>
@@ -85,23 +85,6 @@
             animation-iteration-count: infinite;
         }
 
-        input {
-            padding: 6px 6px;
-        }
-
-        select {
-            height: 30px;
-            width: 50px;
-            text-align: center;
-        }
-
-        .main-layout {
-            height: 100%;
-            width: 100%;
-            display: table;
-            clear: both;
-        }
-
         .card {
             border: none;
             border-radius: 5px;
@@ -111,6 +94,19 @@
 
         /* TODO: Header styles */
         .header {
+            width: 100%;
+            float: left;
+            padding: 2px;
+            height: 60px;
+            align-content: center;
+            background-color: rgb(243, 243, 243);
+            /* position: sticky;
+            top: 0;
+            position: 0;
+            z-index: 1 */
+        }
+
+        .navbar {
             box-shadow: 0 4px 8px 0 rgba(31, 175, 55, 0.15);
             height: 45px;
         }
@@ -132,16 +128,24 @@
             align-content: center;
         }
 
-        .sub-ly {
+        select {
+            height: 30px;
+            width: 50px;
+            text-align: center;
+        }
+
+        .main-layout {
+            height: 100%;
             width: 100%;
-            float: left;
-            padding: 2px;
+            display: table;
+            clear: both;
         }
 
         input {
             border-width: 1px;
             height: 30px;
             border-radius: 6px;
+            padding: 6px 6px;
         }
 
         .button {
@@ -174,27 +178,19 @@
             cursor: pointer;
         }
 
+
         /* TODO: Contect styles */
-        .row-grap {
-            display: flex;
-            flex-wrap: inherit;
-            /* text-align: center; */
-        }
+        .chart-layout {
+            padding: 2px;
+            display: grid;
+            grid-template-columns: 50% 50%;
+            gap: 10px;
+            padding: 20px 10px 10px 10px;
 
-        .col-grap {
-            /* float: left; */
-            width: 50%;
-            height: 260px;
-            padding: 6px;
-            margin: 6px;
-        }
-
-        /* @media (max-width: 300px) {
-            .col-grap {
-                flex-direction: column;
-                flex: 100%
+            @media screen and (max-width:800px) {
+                grid-template-columns: 1fr;
             }
-        } */
+        }
 
         table {
             border-collapse: collapse;
@@ -223,7 +219,7 @@
         th,
         td {
             text-align: left;
-            padding: 8px;
+            padding: 4px;
             border-bottom: 1px solid #DDD;
         }
 
@@ -356,8 +352,8 @@
 </head>
 
 <body>
-    <header class="sub-ly" style="height: 60px; align-content: center;  background-color: rgb(243, 243, 243);">
-        <nav class="header">
+    <header class="header">
+        <nav class="navbar">
             <section class="row-h">
                 <div>
                     <label>Selelect date:</label>
@@ -399,34 +395,21 @@
                 </dialog>
             </section>
         </nav>
-
     </header>
     <main>
-        <section class="sub-ly" style="background-color: rgb(253, 253, 253);">
-            <section class="row-grap">
-                <div class="col-grap card" id="leftSensor"></div>
-                <div class="col-grap card" id="rigthSensor"></div>
-            </section>
-            <section class="row-grap">
-                <div class="col-grap card" id="heightSensor"></div>
-                <div class="col-grap card" id="weightBal"></div>
-            </section>
-            <section class="row-grap">
-                <div class="col-grap card" id="emisCO21"></div>
-                <div class="col-grap card" id="emisCO22"></div>
-            </section>
-            <section class="row-grap">
-                <div class="col-grap card" id="airHum1"></div>
-                <div class="col-grap card" id="airHum2"></div>
-            </section>
-            <section class="row-grap">
-                <div class="col-grap card" id="temp1"></div>
-                <div class="col-grap card" id="temp2"></div>
-            </section>
-            <section class="row-grap">
-                <div class="col-grap card" id="temp3"></div>
-                <div class="col-grap"></div>
-            </section>
+        <section class="chart-layout" style="background-color: rgb(253, 253, 253);">
+            <div class="col-grap card" id="leftSensor"></div>
+            <div class="col-grap card" id="rigthSensor"></div>
+            <div class="col-grap card" id="heightSensor"></div>
+            <div class="col-grap card" id="weightBal"></div>
+            <div class="col-grap card" id="emisCO21"></div>
+            <div class="col-grap card" id="emisCO22"></div>
+            <div class="col-grap card" id="airHum1"></div>
+            <div class="col-grap card" id="airHum2"></div>
+            <div class="col-grap card" id="temp1"></div>
+            <div class="col-grap card" id="temp2"></div>
+            <div class="col-grap card" id="temp3"></div>
+            <div class="col-grap"></div>
         </section>
         <hr />
         <section style="width: 100%; text-align: center; display: flex; justify-content: center; align-items: center;">
