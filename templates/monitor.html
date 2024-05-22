@@ -198,13 +198,31 @@
 </html>
 
 <script>
-    const socket = io();
+    var socket = null;
 
-    socket.on("data", (data) => {
-        console.log(data);
-        var diameter1 = document.getElementById('diameter1');
-        diameter1.innerHTML = data.val1;
-        var diameter2 = document.getElementById('diameter2');
-        diameter2.innerHTML = data.val2;
-    })
+    function initializeWebSocket() {
+        socket = io(`/ondata`, {
+            // autoConnect: true,
+            reconnection: true,
+            // transports: ["polling"],
+        });
+        // socket.onopen = () => console.log('WebSocket connected');
+        // socket.onclose = () => console.log('WebSocket disconnected');
+        // socket.onerror = (error) => console.error('WebSocket error', error);
+        // socket.onmessage = (message) => console.log('WebSocket message', message.data);
+        socket.on("datalog", (data) => {
+            for (const [key, value] of Object.entries(data)) {
+                let element = document.getElementById(key);
+                element.textContent = value;
+            }
+        });
+    }
+
+    window.addEventListener('pageshow', () => {
+        initializeWebSocket();
+    });
+
+    window.addEventListener('pagehide', (event) => {
+        socket.close(1000, 'Client leaving the page'); // Close code 1000 indicates normal closure
+    });
 </script>

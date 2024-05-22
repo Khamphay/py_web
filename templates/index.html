@@ -13,8 +13,6 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script> -->
     <script src="/static/dist/apexcharts.js"></script>
     <script src="/static/swalert/swalert.js"></script>
-
-
     <style>
         * {
             box-sizing: border-box;
@@ -97,8 +95,9 @@
             width: 100%;
             float: left;
             padding: 2px;
-            height: 60px;
+            height: 80px;
             align-content: center;
+            align-items: center;
             background-color: rgb(243, 243, 243);
             /* position: sticky;
             top: 0;
@@ -109,12 +108,15 @@
         .navbar {
             box-shadow: 0 4px 8px 0 rgba(31, 175, 55, 0.15);
             height: 45px;
+            display: flex;
+            /* clear: both; */
         }
 
-        .row-h {
-            width: 100%;
-            display: flex;
-            clear: both;
+        .navbar>div {
+            margin-left: 10px;
+            width: fix-content;
+            align-content: center;
+            align-self: center;
         }
 
         h4 {
@@ -122,14 +124,8 @@
             margin: 0px;
         }
 
-        .row-h>div {
-            margin-left: 10px;
-            width: fix-content;
-            align-content: center;
-        }
-
         select {
-            height: 30px;
+            height: 35px;
             width: 50px;
             text-align: center;
         }
@@ -143,7 +139,7 @@
 
         input {
             border-width: 1px;
-            height: 30px;
+            height: 35px;
             border-radius: 6px;
             padding: 6px 6px;
         }
@@ -308,9 +304,12 @@
         }
 
         .pagination {
-            display: flex;
+            /* display: flex; */
             justify-content: center;
             align-items: center;
+            display: flex;
+            flex-direction: row;
+            gap: 4px;
         }
 
         .pagination button {
@@ -354,46 +353,47 @@
 <body>
     <header class="header">
         <nav class="navbar">
-            <section class="row-h">
+            <!-- <section class="row-h"> -->
+            <div><button class="button" onclick="showFileHistory()">Files</button></div>
+            <div>
+                <a href="{{url_for('monitor')}}">
+                    <button class="button" style="width: fit-content;" onclick=""><i class="fa-solid fa-gauge"></i> Monitor</button>
+                </a>
+            </div>
+            <dialog id="fileDialog">
+                <div style="display: flex; height: max-content;">
+                    <div style="width: 100%; ">
+                        <h4 style="margin: 8px;">File histories</h4>
+                    </div>
+                    <div>
+                        <button class="btn" id="btnClose" onclick="closeFileHistory()" value="cancel" formmethod="dialog"><i class="fa fa-close"></i></button>
+                    </div>
+                </div>
+                <hr style="color: rgba(0, 133, 0, 0.4);" />
                 <div>
-                    <label>Selelect date:</label>
+                    <div style="justify-content: center;">
+                        <ul id="fileList" style="padding: 0px 0px 0px 10px;">
+                            <!-- Render elements here when open dialog -->
+                        </ul>
+                    </div>
+                </div>
+            </dialog>
+
+            <!-- <div>
+                    <label>Select date:</label>
                     <input type="date" id="dateTime" onchange="onDateChange()">
                 </div>
-                <div><button class="button" onclick="onRefreshClick()">Refresh</button></div>
-                <div>
-                    <label>File name:</label>
-                    <input type="text" id="fileName" onkeypress="return !(/[!@#$%^&*()+\=\[\]{};: \\|,.<>\/?]+/i.test(event.key))" style="height: 30px; border-radius: 6px;">
-                </div>
-                <div style="width: fix-content;">
-                    <label>Timer (minutes):</label>
-                    <input type="text" id="interval" maxlength="4" onkeypress="return /[0-9]/i.test(event.key)" min="1" max="120" style="height: 30px; width: 60px; border-radius: 6px;">
-                </div>
-                <div> <button class="button" id="btn_record" onclick="recordData()">Record</button></div>
-                <div><button class="button" onclick="showFileHistory()">Files</button></div>
-                <div>
-                    <a href="{{url_for('monitor')}}">
-                        <button class="button" style="width: fit-content;" onclick=""><i class="fa-solid fa-gauge"></i> Monitor</button>
-                    </a>
-                </div>
-                <dialog id="fileDialog">
-                    <div style="display: flex; height: max-content;">
-                        <div style="width: 100%; ">
-                            <h4 style="margin: 8px;">File histories</h4>
-                        </div>
-                        <div>
-                            <button class="btn" id="btnClose" onclick="closeFileHistory()" value="cancel" formmethod="dialog"><i class="fa fa-close"></i></button>
-                        </div>
-                    </div>
-                    <hr style="color: rgba(0, 133, 0, 0.4);" />
-                    <div>
-                        <div style="justify-content: center;">
-                            <ul id="fileList" style="padding: 0px 0px 0px 10px;">
-                                <!-- Render elements here when open dialog -->
-                            </ul>
-                        </div>
-                    </div>
-                </dialog>
-            </section>
+                <div><button class="button" onclick="onRefreshClick()">Refresh</button></div> -->
+            <div>
+                <label style="margin-left: 10px;">File name:</label>
+                <input type="text" id="fileName" placeholder="Enter file name" onkeypress="return !(/[!@#$%^&*()+\=\[\]{};: \\|,.<>\/?]+/i.test(event.key))" style="height: 30px; border-radius: 6px;">
+            </div>
+            <div style="width: fix-content;">
+                <label>Timer:</label>
+                <input type="text" id="interval" placeholder="Enter minute" maxlength="4" onkeypress="return /[0-9]/i.test(event.key)" min="1" max="120" style="height: 30px; width: 100px; border-radius: 6px;">
+            </div>
+            <div> <button class="button" id="btn_record" onclick="recordData()">Record</button></div>
+            <!-- </section> -->
         </nav>
     </header>
     <main>
@@ -414,16 +414,24 @@
         <hr />
         <section style="width: 100%; text-align: center; display: flex; justify-content: center; align-items: center;">
             <div class="pagination">
-                <select onchange="onSelectView()" name="view" id="selection">
-                    <option value="10">10</option>
-                    <option value="30">30</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="200">200</option>
-                    <option value="300">300</option>
-                    <option value="400">400</option>
-                    <option value="500">500</option>
-                </select>
+                <div>
+                    <label>Select date:</label>
+                    <input type="date" id="dateTime" onchange="onDateChange()">
+                </div>
+                <!-- <div><button class="button" onclick="onRefreshClick()">Refresh</button></div> -->
+                <div>
+                    <label style="padding-left: 4px;">Rows/Page:</label>
+                    <select onchange="onSelectView()" name="view" id="selection" style="border-radius: 6px;">
+                        <option value="10">10</option>
+                        <option value="30">30</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="200">200</option>
+                        <option value="300">300</option>
+                        <option value="400">400</option>
+                        <option value="500">500</option>
+                    </select>
+                </div>
                 <button onclick="previousPage(true)"><img src="/static/assets/dou_left.svg" alt=""></button>
                 <button onclick="previousPage(false)"><img src="/static/assets/sin_left.svg" alt=""></button>
                 <span>Page</span><span id="currentPage">0</span><span>of</span> <span id="totalPage"> 20</span>
@@ -721,8 +729,12 @@
             recording = res_data.isRecording ?? false;
             if (recording == true) {
                 btnRecord.textContent = "Stop";
+                document.getElementById("fileName").setAttribute('readonly', true);
+                document.getElementById("interval").setAttribute("readonly", true);
             } else {
                 btnRecord.textContent = "Record";
+                document.getElementById("fileName").setAttribute('readonly', false);
+                document.getElementById("interval").setAttribute("readonly", false);
             }
 
             currentPage.innerHTML = page;
@@ -779,6 +791,9 @@
             onDate = null;
         else
             onDate = new Date(dateElm.value).toISOString().split('T')[0];
+
+        page = 1;
+        fillData(page);
     }
 
     function onRefreshClick() {
@@ -908,5 +923,13 @@
             confirmButtonText: "OK"
         });
     }
+
+
+
+    window.addEventListener('pageshow', function (event) {
+        if (event.persisted) {
+            fillData(page);
+        }
+    });
 
 </script>

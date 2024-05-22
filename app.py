@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, abort
 from flask_socketio import SocketIO
 from flask_compress import Compress
 import time
@@ -7,7 +7,7 @@ import csv
 import os
 from datetime import datetime
 
-app = Flask(__name__, static_folder="static")
+app = Flask(__name__, static_folder="static", static_url_path="/static")
 Compress(app)
 socketio = SocketIO(app)
 tasks: list[Thread] = []
@@ -91,7 +91,7 @@ def data():
     json_data = read_csv_file(start, end, date)
     json_data["page"] = page
     json_data["perPage"] = per_page
-    json_data["isRecording"] = False
+    json_data["isRecording"] = True
 
     return jsonify(json_data)
 
